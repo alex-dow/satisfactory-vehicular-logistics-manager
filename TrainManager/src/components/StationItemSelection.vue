@@ -1,14 +1,24 @@
 <template>
   <div class="flex">
     <form class="flex items-center gap-2" @submit.prevent="onAdd">
-      <SingleItemSelect id="item-select" v-model="formData.item" class="w-56" />
-      <InputText
-        v-model="formData.rate"
-        type="number"
-        size="small"
-        variant="filled"
-        class="w-24"
-      />
+      <div>
+        <div class="w-full">
+          <SingleItemSelect
+            id="item-select"
+            v-model="formData.item"
+            class="w-56"
+          />
+        </div>
+        <div class="w-full">
+          <InputText
+            v-model="formData.rate"
+            type="number"
+            size="small"
+            variant="filled"
+            class="w-24"
+          />
+        </div>
+      </div>
       <Button
         icon="pi pi-plus"
         variant="text"

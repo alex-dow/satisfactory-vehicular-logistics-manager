@@ -63,6 +63,7 @@ import { computed, ref } from "vue";
 
 import { OhVueIcon } from "oh-vue-icons";
 import { Button } from "primevue";
+import AutoComplete from "primevue";
 
 import StationItemSelection from "./StationItemSelection.vue";
 

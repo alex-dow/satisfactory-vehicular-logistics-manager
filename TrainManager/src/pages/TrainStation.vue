@@ -42,7 +42,7 @@
           :key="'platform-' + stationIndex + '-' + idx"
           :train-station="trainStation"
           :platform-index="idx"
-          :station-index="idx"
+          :station-index="stationIndex"
           :project-id="projectId"
         />
       </div>
