@@ -40,7 +40,14 @@
             />
           </div>
           <p class="m-0 p-0">
-            {{ trainStation.station_name }}
+            <RouterLink
+              :to="{
+                name: 'train-station',
+                params: { projectId, stationIndex: trainStationIdx },
+              }"
+            >
+              {{ trainStation.station_name }}
+            </RouterLink>
           </p>
           <div class="ml-auto">
             <Button
@@ -141,7 +148,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
 
-import { Button, Splitter, SplitterPanel, Tree, useConfirm } from "primevue";
+import { Button, Splitter, SplitterPanel, useConfirm } from "primevue";
 import { type TreeNode } from "primevue/treenode";
 
 import type { TMProject } from "@/api/types";

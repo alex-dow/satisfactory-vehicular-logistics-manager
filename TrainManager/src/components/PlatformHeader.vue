@@ -7,7 +7,7 @@
         src="/data/items/desc-traindockingstation-c_64.png"
         style="width: 24px; height: 24px"
       />
-      <h3>Platform #{{ props.platformIdx + 1 }}</h3>
+      <h3>Platform #{{ props.platformIndex + 1 }}</h3>
     </div>
     <Button
       icon="pi pi-trash"
@@ -26,18 +26,27 @@
 <script lang="ts" setup>
 import { Button } from "primevue";
 
-import type { TrainStation } from "@/satisfactory/trainStations";
+import type { TMProject, TMTrainStation } from "@/api/types";
 
-import { useTrainStore } from "@/stores/useTrainStore";
-
-const trainStore = useTrainStore();
+import { useProject, useSaveProject } from "@/api/useProjects";
 
 const props = defineProps<{
-  trainStation: TrainStation;
-  platformIdx: number;
+  trainStation: TMTrainStation;
+  stationIndex: number;
+  platformIndex: number;
+  projectId: number;
 }>();
 
+const { data: project } = useProject(props.projectId);
+const saveProject = useSaveProject();
+
 const removePlatform = () => {
-  trainStore.removePlatform(props.trainStation.id, props.platformIdx);
+  const newProject: TMProject = JSON.parse(JSON.stringify(project.value));
+  newProject.train_stations[props.stationIndex].platforms.splice(
+    props.platformIndex,
+    1,
+  );
+
+  saveProject.mutate(newProject);
 };
 </script>

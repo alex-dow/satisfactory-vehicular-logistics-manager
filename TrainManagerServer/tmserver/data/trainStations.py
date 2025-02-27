@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 
@@ -13,6 +13,7 @@ class TMPlatformItem(BaseModel):
 
     rate: float
     """Rate of input or output in items per minute"""
+
 
 
 class TMPlatform(BaseModel):

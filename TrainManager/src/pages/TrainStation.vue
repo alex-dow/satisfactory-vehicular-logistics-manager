@@ -6,7 +6,9 @@
         class="rounded-lg"
         style="width: 48px; height: 48px"
       />
-      <h1 class="m-0 text-4xl font-bold">Station: {{ trainStation.name }}</h1>
+      <h1 class="m-0 text-4xl font-bold">
+        Station: {{ trainStation.station_name }}
+      </h1>
     </div>
     <hr />
 
@@ -37,9 +39,11 @@
         </div>
         <Platform
           v-for="(platform, idx) in trainStation.platforms"
-          :key="'platform-' + trainStation.id + '-' + idx"
+          :key="'platform-' + stationIndex + '-' + idx"
           :train-station="trainStation"
-          :platform-idx="idx"
+          :platform-index="idx"
+          :station-index="idx"
+          :project-id="projectId"
         />
       </div>
       <div class="w-4/12">
@@ -50,35 +54,42 @@
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
 import { computed } from "vue";
-import { useRoute } from "vue-router";
 
 import { Button } from "primevue";
 
+import type { TMProject } from "@/api/types";
+
+import { useProject, useSaveProject } from "@/api/useProjects";
 import Platform from "@/components/Platform.vue";
 import TrainNetworkOverview from "@/components/TrainNetworkOverview.vue";
-import { type TrainStation } from "@/satisfactory/trainStations";
-import { useTrainStore } from "@/stores/useTrainStore";
 
-const trainStore = useTrainStore();
-const { trainStations } = storeToRefs(trainStore);
+const props = defineProps<{
+  projectId: string;
+  stationIndex: string;
+}>();
 
-const trainStation = computed<TrainStation>(() => {
-  return trainStations.value.find(
-    (station) => station.id === stationId.value,
-  ) as TrainStation;
+const projectId = computed(() => parseInt(props.projectId));
+const stationIndex = computed(() => parseInt(props.stationIndex));
+
+const { data: project } = useProject(projectId.value);
+
+const saveProject = useSaveProject();
+
+const trainStation = computed(() => {
+  return project.value?.train_stations[stationIndex.value];
 });
-
-const route = useRoute();
 
 const addPlatform = () => {
   if (trainStation.value) {
-    trainStore.addPlatform(trainStation.value.id);
+    const newProject: TMProject = JSON.parse(JSON.stringify(project.value));
+
+    newProject.train_stations[stationIndex.value].platforms.push({
+      inputs: [],
+      outputs: [],
+    });
+
+    saveProject.mutate(newProject);
   }
 };
-
-const stationId = computed(() => {
-  return parseInt(route.params.id as string);
-});
 </script>

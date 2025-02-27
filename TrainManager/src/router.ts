@@ -35,6 +35,12 @@ const routes = [
             props: true,
             name: "train-stations",
           },
+          {
+            path: "train-stations/:stationIndex",
+            component: TrainStation,
+            name: "train-station",
+            props: true,
+          },
         ],
       },
     ],

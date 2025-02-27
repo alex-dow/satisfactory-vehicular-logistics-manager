@@ -25,16 +25,16 @@
   <div v-if="items.length > 0">
     <div
       v-for="item in items"
-      :key="item.item.id"
+      :key="item.item_id"
       class="mb-1 mt-1 flex items-center gap-2 rounded-sm bg-surface-950 p-2 hover:bg-surface-800"
     >
       <img
-        :src="'/data/items/' + item.item.icon + '_64.png'"
+        :src="'/data/items/' + sfyStore.itemIcons[item.item_id] + '_64.png'"
         style="width: 32px; height: 32px"
       />
       <div>
         <span class="text-sm text-surface-500">Item</span>
-        <div>{{ item.item.name }}</div>
+        <div>{{ sfyStore.itemNames[item.item_id] }}</div>
       </div>
       <div class="ml-auto">{{ item.rate }} / min</div>
       <Button
@@ -44,7 +44,7 @@
         raised
         variant="outlined"
         severity="warn"
-        @click="() => onRemove(item.item)"
+        @click="() => onRemove(item.item_id)"
       />
     </div>
   </div>
@@ -62,53 +62,88 @@
 import { computed, ref } from "vue";
 
 import { OhVueIcon } from "oh-vue-icons";
-import { MdInput } from "oh-vue-icons/icons";
 import { Button } from "primevue";
 
 import StationItemSelection from "./StationItemSelection.vue";
 
-import type {
-  PlatformTransfer,
-  TrainStation,
-} from "@/satisfactory/trainStations";
-import type { BasicItem } from "@/satisfactory/types";
+import type { TMPlatformItem, TMProject } from "@/api/types";
+import type { PlatformTransfer } from "@/satisfactory/trainStations";
 
-import { useTrainStore } from "@/stores/useTrainStore";
-
-const trainStore = useTrainStore();
+import { useProject, useSaveProject } from "@/api/useProjects";
+import { useSatisfactoryStore } from "@/stores/useSatisfactoryStore";
 
 const props = defineProps<{
-  trainStation: TrainStation;
-  platformIdx: number;
+  platformIndex: number;
+  stationIndex: number;
+  projectId: number;
   direction: "input" | "output";
 }>();
 
-const items = computed(() => {
+const { data: project } = useProject(props.projectId);
+
+const sfyStore = useSatisfactoryStore();
+
+const trainStation = computed(() => {
+  return project.value?.train_stations[props.stationIndex];
+});
+
+const items = computed<TMPlatformItem[]>(() => {
   if (props.direction === "input") {
-    return props.trainStation.platforms[props.platformIdx].inputs;
+    return trainStation.value?.platforms[props.platformIndex].inputs || [];
   } else {
-    return props.trainStation.platforms[props.platformIdx].outputs;
+    return trainStation.value?.platforms[props.platformIndex].outputs || [];
   }
 });
 
 const showAddForm = ref(false);
 
+const saveProject = useSaveProject();
+
 const onAdd = (item: PlatformTransfer) => {
-  trainStore.addPlatformItem(
-    props.trainStation.id,
-    props.platformIdx,
-    item.item,
-    item.rate,
-    props.direction,
-  );
+  const newProject: TMProject = JSON.parse(JSON.stringify(project.value));
+
+  if (props.direction == "input") {
+    newProject.train_stations[props.stationIndex].platforms[
+      props.platformIndex
+    ].inputs.push({
+      item_id: item.item.id,
+      rate: item.rate,
+    });
+  } else if (props.direction == "output") {
+    newProject.train_stations[props.stationIndex].platforms[
+      props.platformIndex
+    ].outputs.push({
+      item_id: item.item.id,
+      rate: item.rate,
+    });
+  }
+
+  saveProject.mutate(newProject);
 };
 
-const onRemove = (item: BasicItem) => {
-  trainStore.removePlatformItem(
-    props.trainStation.id,
-    props.platformIdx,
-    item,
-    props.direction,
-  );
+const onRemove = (itemId: string) => {
+  const newProject: TMProject = JSON.parse(JSON.stringify(project.value));
+
+  let listName: "outputs" | "inputs";
+
+  if (props.direction === "input") {
+    listName = "inputs";
+  } else {
+    listName = "outputs";
+  }
+
+  const list =
+    newProject.train_stations[props.stationIndex].platforms[
+      props.platformIndex
+    ][listName];
+  const idx = list.findIndex((i) => i.item_id === itemId);
+  if (idx > -1) {
+    list.splice(idx, 1);
+    newProject.train_stations[props.stationIndex].platforms[
+      props.platformIndex
+    ][listName] = list;
+
+    saveProject.mutate(newProject);
+  }
 };
 </script>

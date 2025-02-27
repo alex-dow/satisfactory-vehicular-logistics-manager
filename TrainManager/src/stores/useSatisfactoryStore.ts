@@ -24,12 +24,38 @@ export const useSatisfactoryStore = defineStore("satisfactory-store", () => {
 
     return Object.values(items.value)
       .map((item) => {
-        return { id: item.slug, name: item.name, icon: item.icon };
+        return { id: item.className, name: item.name, icon: item.icon };
       })
       .sort((a, b) => {
         return a.name.localeCompare(b.name);
       });
   });
 
-  return { items, refresh, basicItems };
+  const itemIcons = computed(() => {
+    if (items.value == null) {
+      return {};
+    }
+    return Object.values(items.value).reduce(
+      (a, item) => {
+        a[item.className] = item.icon;
+        return a;
+      },
+      {} as Record<string, string | undefined>,
+    );
+  });
+
+  const itemNames = computed(() => {
+    if (items.value == null) {
+      return {};
+    }
+    return Object.values(items.value).reduce(
+      (a, item) => {
+        a[item.className] = item.name;
+        return a;
+      },
+      {} as Record<string, string | undefined>,
+    );
+  });
+
+  return { items, refresh, basicItems, itemIcons, itemNames };
 });
