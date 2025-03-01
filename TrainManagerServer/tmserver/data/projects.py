@@ -70,7 +70,7 @@ def save_project(project: TMProject) -> TMProject:
         session.commit()
         session.refresh(entry)
 
-        return get_project(entry.id)
+        return get_project(project.id) # type: ignore
 
 
 

@@ -8,3 +8,4 @@ DATABASE_DEBUG = True
 engine = create_engine(DATABASE_URL, echo=DATABASE_DEBUG)
 
 Session = sessionmaker(engine)
+

@@ -51,5 +51,5 @@ def api_delete_project(project_id: int, user: Annotated[TMUser, Depends(get_oaut
     if project.owner_id != user.id:
         raise InvalidProjectError("Project id %i does not belong to user %s" % (project_id, user.username))
 
-    delete_project(project.id)
+    delete_project(project_id)
 
