@@ -3,6 +3,7 @@
 @import "./primevue/tailwind.css";
 @import "primeicons/primeicons.css";
 @import "tailwindcss/utilities";
+@import "./theme.css";
 
 :root {
   --p-primary-50: #ecfdf5;

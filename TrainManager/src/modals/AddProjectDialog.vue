@@ -2,7 +2,7 @@
   <Dialog
     v-model:visible="visible"
     modal
-    header="Add Train Station"
+    header="Create a New Project"
     @show="formData.projectName = ''"
   >
     <form @submit.prevent="onSubmit">
@@ -19,7 +19,7 @@
           severity="secondary"
           @click="visible = false"
         ></Button>
-        <Button type="submit" label="Add Station"></Button>
+        <Button type="submit" label="Create"></Button>
       </div>
     </form>
   </Dialog>
@@ -29,6 +29,8 @@
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
 
+import { Dialog, InputText, Button } from "primevue";
+
 import { useCreateProject } from "@/api/useProjects";
 
 const visible = defineModel<boolean>();
@@ -36,15 +38,13 @@ const visible = defineModel<boolean>();
 const createProject = useCreateProject();
 
 const formData = reactive<{
-  projectName: string;
-}>({
-  projectName: "",
-});
+  projectName?: string;
+}>({});
 
 const router = useRouter();
 
 const onSubmit = async () => {
-  const newProject = await createProject.mutateAsync(formData.projectName);
+  const newProject = await createProject.mutateAsync(formData.projectName!);
   router.push({ name: "project", params: { projectId: newProject.id } });
 };
 </script>

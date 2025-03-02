@@ -3,7 +3,6 @@
     <PlatformHeader
       :platform-index="props.platformIndex"
       :station-index="props.stationIndex"
-      :project-id="props.projectId"
       :train-station="props.trainStation"
     ></PlatformHeader>
     <div class="mt-1 flex gap-2">
@@ -11,7 +10,6 @@
         <PlatformIO
           :platform-index="props.platformIndex"
           :station-index="props.stationIndex"
-          :project-id="props.projectId"
           direction="input"
         />
       </div>
@@ -19,7 +17,6 @@
         <PlatformIO
           :platform-index="props.platformIndex"
           :station-index="props.stationIndex"
-          :project-id="props.projectId"
           direction="output"
         />
       </div>
@@ -37,6 +34,5 @@ const props = defineProps<{
   trainStation: TMTrainStation;
   platformIndex: number;
   stationIndex: number;
-  projectId: number;
 }>();
 </script>

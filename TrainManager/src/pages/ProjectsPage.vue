@@ -23,6 +23,7 @@
     <Column field="id" header="ID" />
     <Column field="project_name" header="Project Name" />
   </DataTable>
+  <AddProjectDialog v-model:visible="showAddDialog" />
 </template>
 
 <script lang="ts" setup>
@@ -34,6 +35,9 @@ import { Button, Column, DataTable } from "primevue";
 import type { TMProject } from "@/api/types";
 
 import { useProjects } from "@/api/useProjects";
+import AddProjectDialog from "@/modals/AddProjectDialog.vue";
+
+const showAddDialog = ref(false);
 
 const projects = useProjects();
 const router = useRouter();
@@ -41,7 +45,6 @@ const router = useRouter();
 const selectedRows = ref<TMProject[]>([]);
 
 const onSelectRow = ({ data }) => {
-  console.log(data.id);
   router.push("/projects/" + data.id);
 };
 </script>

@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
 import { reactive } from "vue";
+import { useRouter } from "vue-router";
 
 import { Button, InputText } from "primevue";
 import Dialog from "primevue/dialog";
@@ -34,38 +35,34 @@ import Dialog from "primevue/dialog";
 import type { TMProject } from "@/api/types";
 
 import { useProject, useSaveProject } from "@/api/useProjects";
-import { useTrainStore } from "@/stores/useTrainStore";
+import { useProjectStore } from "@/stores/useProjectStore";
 
 const visible = defineModel<boolean>({ default: false });
 
-const props = defineProps<{
-  projectId: number;
-}>();
-
-const saveProject = useSaveProject();
-const { data: project } = useProject(props.projectId);
-
-const store = useTrainStore();
+const projectStore = useProjectStore();
 
 const formData = reactive<{
-  stationName: string;
+  stationName?: string;
 }>({
   stationName: "",
 });
 
+const router = useRouter();
+
 const onSubmit = async () => {
-  const newProject: TMProject = JSON.parse(JSON.stringify(project.value));
-  if (!newProject.train_stations) {
-    newProject.train_stations = [];
+  if (!formData.stationName) {
+    return;
   }
-  newProject.train_stations.push({
-    station_name: formData.stationName,
-    platforms: [],
+
+  projectStore.addTrainStation(formData.stationName);
+  router.push({
+    name: "train-station",
+    params: {
+      projectId: projectStore.project?.id,
+      stationIndex: projectStore.project?.train_stations.length - 1,
+    },
   });
 
-  console.log("new project:", newProject);
-
-  await saveProject.mutateAsync(newProject);
   visible.value = false;
 };
 </script>

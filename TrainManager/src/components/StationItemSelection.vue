@@ -3,7 +3,7 @@
     <form class="flex items-center gap-2" @submit.prevent="onAdd">
       <div>
         <div class="w-full">
-          <SingleItemSelect
+          <SingleItemAutocomplete
             id="item-select"
             v-model="formData.item"
             class="w-56"
@@ -51,6 +51,7 @@ import { shallowReactive } from "vue";
 
 import { Button, InputText, Select } from "primevue";
 
+import SingleItemAutocomplete from "./SingleItemAutocomplete.vue";
 import SingleItemSelect from "./SingleItemSelect.vue";
 
 import type { PlatformTransfer } from "@/satisfactory/trainStations";

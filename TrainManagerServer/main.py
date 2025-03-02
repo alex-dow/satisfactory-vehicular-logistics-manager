@@ -4,7 +4,6 @@ from fastapi.responses import PlainTextResponse
 
 from tmserver.api.projects import router as projects_router
 from tmserver.api.session import router as session_router
-from tmserver.api.trainStations import router as train_stations_router
 from tmserver.api.users import router as users_router
 from tmserver.db.tables import init_db
 from tmserver.exc import InvalidTokenError
@@ -25,10 +24,9 @@ app.add_middleware(
 
 
 @app.on_event("startup")
-def on_startup():
+async def on_startup():
     init_db()
 
 app.include_router(projects_router)
 app.include_router(session_router)
-app.include_router(train_stations_router)
 app.include_router(users_router)

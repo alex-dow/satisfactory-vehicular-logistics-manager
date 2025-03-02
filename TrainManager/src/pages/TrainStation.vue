@@ -7,7 +7,7 @@
         style="width: 48px; height: 48px"
       />
       <h1 class="m-0 text-4xl font-bold">
-        Station: {{ trainStation.station_name }}
+        {{ trainStation.station_name }}
       </h1>
     </div>
     <hr />
@@ -43,7 +43,6 @@
           :train-station="trainStation"
           :platform-index="idx"
           :station-index="stationIndex"
-          :project-id="projectId"
         />
       </div>
       <div class="w-4/12">
@@ -54,42 +53,31 @@
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
 import { computed } from "vue";
+import { useRoute } from "vue-router";
 
 import { Button } from "primevue";
 
-import type { TMProject } from "@/api/types";
-
-import { useProject, useSaveProject } from "@/api/useProjects";
 import Platform from "@/components/Platform.vue";
 import TrainNetworkOverview from "@/components/TrainNetworkOverview.vue";
+import { useProjectStore } from "@/stores/useProjectStore";
 
-const props = defineProps<{
-  projectId: string;
-  stationIndex: string;
-}>();
+const route = useRoute();
 
-const projectId = computed(() => parseInt(props.projectId));
-const stationIndex = computed(() => parseInt(props.stationIndex));
+const stationIndex = computed(() => {
+  return parseInt(route.params.stationIndex as string);
+});
 
-const { data: project } = useProject(projectId.value);
+const projectStore = useProjectStore();
 
-const saveProject = useSaveProject();
+const { project } = storeToRefs(projectStore);
 
 const trainStation = computed(() => {
   return project.value?.train_stations[stationIndex.value];
 });
 
 const addPlatform = () => {
-  if (trainStation.value) {
-    const newProject: TMProject = JSON.parse(JSON.stringify(project.value));
-
-    newProject.train_stations[stationIndex.value].platforms.push({
-      inputs: [],
-      outputs: [],
-    });
-
-    saveProject.mutate(newProject);
-  }
+  projectStore.addPlatform(stationIndex.value);
 };
 </script>

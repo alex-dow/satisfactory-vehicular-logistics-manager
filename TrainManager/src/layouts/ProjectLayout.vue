@@ -1,20 +1,44 @@
 <template>
-  <div class="flex w-full">
+  <div class="flex w-full flex-grow flex-col">
+    <div class="m-1 rounded-sm bg-surface-900 p-1">
+      <h4 class="m-0 p-0 text-lg font-bold">
+        {{ project?.project_name }}
+      </h4>
+      <p class="m-0 p-0 text-xs">
+        <i v-if="!modified" class="pi pi-check text-green"></i>
+        <i v-else class="pi pi-save text-red" />
+        <VeProgress
+          :progress="saveTimerProgress"
+          :size="200"
+          animation="default 200 2000"
+          hide-legend
+          :loading="saveProject.isPending"
+        />
+        Modified: {{ modified }} - Save: {{ saveCounter }} - Progress:
+        {{ saveTimerProgress }}% status: {{ saveProject.status }} - isPending:
+        {{ saveProject.isPending }} - isSuccess: {{ saveProject.isSuccess }} -
+        isError: {{ saveProject.isError }}
+      </p>
+    </div>
     <Splitter class="w-full">
       <SplitterPanel :size="25">
-        <div class="flex w-full items-center border-2 border-b-orange-500">
+        <div class="flex w-full items-center border-b-2 border-b-orange-500">
           <div class="mr-1">
             <i class="pi pi-angle-right" />
           </div>
-          <!--
-          <img
-            src="/data/items/desc-trainstation-c_64.png"
-            style="width: 24px; height: 24px"
-          />
-        -->
-          <p class="m-0 p-0 text-sm font-bold uppercase text-gray-500">
+          <p
+            v-if="selectedTrainStations.length == 0"
+            class="m-0 p-0 text-sm font-bold uppercase text-gray-500"
+          >
             Train Stations
           </p>
+          <Button
+            v-else
+            severity="danger"
+            size="small"
+            icon="pi pi-trash"
+            label="Delete train stations"
+          />
           <div class="ml-auto p-0">
             <Button
               v-tooltip="'Create a new train station'"
@@ -31,8 +55,14 @@
         <div
           v-for="(trainStation, trainStationIdx) in trainStations"
           :key="trainStation.station_name"
-          class="flex w-full items-center gap-2 hover:bg-slate-200"
+          class="flex w-full items-center gap-2 hover:bg-surface-700"
         >
+          <div>
+            <Checkbox
+              v-model="selectedTrainStations"
+              :value="trainStationIdx"
+            ></Checkbox>
+          </div>
           <div>
             <img
               src="/data/items/desc-trainstation-c_64.png"
@@ -64,74 +94,6 @@
             />
           </div>
         </div>
-
-        <!--
-        <Tree
-          class="w-full p-0"
-          :value="treeNodes"
-          selection-mode="checkbox"
-          :pt="{
-            nodeContent: {
-              class: 'p-0 m-0 gap-0',
-            },
-          }"
-        >
-          <template #default="{ node }">
-            <div v-if="node.key == 'truck-stations'" class="flex w-full gap-2">
-              <img
-                src="/data/items/desc-truck-c_64.png"
-                style="width: 32px; height: 32px"
-              />
-              <p class="m-0 p-0 font-bold text-gray-500">Truck Stations</p>
-            </div>
-            <div
-              v-else-if="node.key == 'train-stations'"
-              class="flex w-full items-center gap-2 border-2 border-b-orange-500"
-            >
-              <img
-                src="/data/items/desc-trainstation-c_64.png"
-                style="width: 24px; height: 24px"
-              />
-              <p class="m-0 p-0 text-sm font-bold uppercase text-gray-500">
-                Train Stations
-              </p>
-              <div class="ml-auto">
-                <i class="pi pi-trash" />
-              </div>
-            </div>
-            <div
-              v-else-if="node.key == 'drone-ports'"
-              class="flex w-full gap-2"
-            >
-              <img
-                src="/data/items/desc-trainstation-c_64.png"
-                style="width: 32px; height: 32px"
-              />
-              <p class="m-0 p-0 font-bold text-gray-500">Drone Ports</p>
-            </div>
-            <div
-              v-else-if="node.key == 'train-consists'"
-              class="flex w-full gap-2"
-            >
-              <img
-                src="/data/items/desc-locomotive-c_64.png"
-                style="width: 32px; height: 32px"
-              />
-              <p class="m-0 p-0 font-bold text-gray-500">Train Consists</p>
-            </div>
-            <div
-              v-else-if="node.key.startsWith('train-station-')"
-              class="flex w-full gap-2"
-            >
-              <img
-                src="/data/items/desc-locomotive-c_64.png"
-                style="width: 32px; height: 32px"
-              />
-              <p class="m-0 p-0">{{ node.label }}</p>
-            </div>
-          </template>
-        </Tree>
-      -->
       </SplitterPanel>
       <SplitterPanel :size="75">
         <router-view />
@@ -146,19 +108,43 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { computed, onBeforeMount, onBeforeUnmount, ref, watch } from "vue";
+import { onBeforeRouteLeave, useRoute } from "vue-router";
 
-import { Button, Splitter, SplitterPanel, useConfirm } from "primevue";
-import { type TreeNode } from "primevue/treenode";
-
-import type { TMProject } from "@/api/types";
+import {
+  Button,
+  Splitter,
+  SplitterPanel,
+  useConfirm,
+  Checkbox,
+} from "primevue";
+import { VeProgress } from "vue-ellipse-progress";
 
 import { useProject, useSaveProject } from "@/api/useProjects";
 import AddTrainStationDialog from "@/modals/AddTrainStationDialog.vue";
+import { useProjectStore } from "@/stores/useProjectStore";
 const confirm = useConfirm();
-const props = defineProps<{
-  projectId: string;
-}>();
+
+const route = useRoute();
+
+const projectId = computed(() => {
+  return parseInt(route.params.projectId as string);
+});
+
+const projectStore = useProjectStore();
+const { project, modified } = storeToRefs(projectStore);
+
+const { data, isLoading } = useProject(projectId.value);
+
+watch(
+  data,
+  () => {
+    console.log("<ProjectLayout> Server state changed, updating store");
+    projectStore.setCurrentProject(data.value || null);
+  },
+  { immediate: true },
+);
 
 const saveProject = useSaveProject();
 
@@ -185,8 +171,6 @@ const confirmDeleteTrainStation = (event: MouseEvent, stationIdx: number) => {
 
 const showAddTrainStationDialog = ref(false);
 
-const projectId = computed(() => parseInt(props.projectId));
-
 const trainStations = computed(() => {
   if (project.value) {
     return project.value.train_stations || [];
@@ -195,52 +179,49 @@ const trainStations = computed(() => {
 });
 
 const deleteTrainStation = async (stationIdx: number) => {
-  const newProject: TMProject = JSON.parse(JSON.stringify(project.value));
-  if (stationIdx >= newProject.train_stations.length) return;
-
-  newProject.train_stations.splice(stationIdx, 1);
-
-  await saveProject.mutateAsync(newProject);
+  projectStore.removeTrainStation(stationIdx);
 };
 
-const treeNodes = computed<TreeNode[]>(() => {
-  const nodes: TreeNode[] = [];
+const saveTimerLength = 10000; // 10 seconds
+let saveTimer: number | null = null;
 
-  nodes.push(
-    {
-      key: "truck-stations",
-      label: "Truck Stations",
-      children: [],
-      selectable: false,
-    },
-    {
-      key: "train-stations",
-      label: "Train Stations",
-      selectable: false,
-      children: trainStations.value.map((trainStation, idx) => {
-        return {
-          key: "train-station-" + idx,
-          label: trainStation.station_name,
-          data: trainStation,
-          selectable: false,
-        };
-      }),
-    },
-    {
-      key: "train-consists",
-      label: "Train Consists",
-      selectable: false,
-    },
+const saveCounter = ref(saveTimerLength);
 
-    {
-      key: "drone-ports",
-      label: "Drone Ports",
-      selectable: false,
-    },
+const saveTimerProgress = computed(() => {
+  return Math.ceil(
+    (parseFloat(saveCounter.value) / parseFloat(saveTimerLength)) * 100,
   );
-
-  return nodes;
 });
 
-const { isLoading, data: project } = useProject(projectId.value);
+const startSaveTimer = () => {
+  stopSaveTimer();
+  saveCounter.value = saveTimerLength;
+  saveTimer = setInterval(async () => {
+    saveCounter.value -= 1000;
+    if (saveCounter.value === 0) {
+      stopSaveTimer();
+      await saveProject.mutateAsync(project.value);
+      startSaveTimer();
+    }
+  }, 1000);
+};
+
+const stopSaveTimer = () => {
+  if (saveTimer != null) {
+    clearInterval(saveTimer);
+    saveTimer = null;
+  }
+};
+
+onBeforeMount(startSaveTimer);
+
+onBeforeUnmount(stopSaveTimer);
+
+onBeforeRouteLeave((to, from) => {
+  if (modified.value === true) {
+    return false;
+  }
+});
+
+const selectedTrainStations = ref([]);
 </script>

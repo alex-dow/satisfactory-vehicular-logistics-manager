@@ -47,26 +47,23 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 import { Card } from "primevue";
 
 import { useProject } from "@/api/useProjects";
 
 const router = useRouter();
-
-const props = defineProps<{
-  projectId: string;
-}>();
+const route = useRoute();
 
 const projectId = computed(() => {
-  return parseInt(props.projectId);
+  return parseInt(route.params.projectId as string);
 });
 
 const gotoTrains = () => {
   router.push({
     name: "train-stations",
-    params: { projectId: props.projectId },
+    params: { projectId: projectId.value },
   });
 };
 

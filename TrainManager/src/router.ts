@@ -21,25 +21,21 @@ const routes = [
       {
         path: "/projects/:projectId",
         component: ProjectLayout,
-        props: true,
         children: [
           {
             path: "",
             component: ProjectPage,
-            props: true,
             name: "project",
           },
           {
             path: "train-stations",
             component: TrainStationsListPage,
-            props: true,
             name: "train-stations",
           },
           {
             path: "train-stations/:stationIndex",
             component: TrainStation,
             name: "train-station",
-            props: true,
           },
         ],
       },
