@@ -3,37 +3,51 @@ from typing import Annotated
 
 from fastapi.params import Depends
 from fastapi.security import OAuth2PasswordBearer, APIKeyCookie
+from sqlalchemy import true
 
 from tmserver.data.users import TMUser, get_user
 import jwt
 
 from tmserver.exc import InvalidTokenError
+from tmserver.settings import Settings, get_settings
 
-JWT_SECRET = "CmvXdsHVuUmpdCQiQTL793k9Oyrd1qe8hNOIkoI9tAv0AuScoLpPU81z88YfpfhL"
 JWT_ALGO = "HS256"
-JWT_EXPIRES = 30
 
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-cookie_scheme = APIKeyCookie(name="session")
+session_cookie = APIKeyCookie(name="session")
+refresh_cookie = APIKeyCookie(name="refresh")
 
-def create_user_token(user: TMUser) -> str:
-    expires = datetime.now(timezone.utc) + timedelta(minutes=JWT_EXPIRES)
+def create_user_token(user: TMUser, expires: int, secret: str) -> str:
+    expiresDate = datetime.now(timezone.utc) + timedelta(minutes=expires)
 
     data = {
         "sub": user.username,
-        "exp": expires
+        "exp": expiresDate.timestamp()
     }
 
-    encoded_jwt = jwt.encode(data, JWT_SECRET, algorithm=JWT_ALGO)
+    encoded_jwt = jwt.encode(data, secret, algorithm=JWT_ALGO)
     return encoded_jwt
 
 
-def get_user_from_token(token: str) -> TMUser:
+def is_token_expired(token: str, secret: str) -> bool:
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=JWT_ALGO)
+        payload = jwt.decode(token, secret, algorithms=JWT_ALGO)
+        expires: float = payload.get("exp")
+
+        if datetime.now().timestamp() > expires:
+            return True
+        else:
+            return False
+    except jwt.exceptions.InvalidTokenError:
+        raise InvalidTokenError
+            
+
+def get_user_from_token(token: str, secret: str) -> TMUser:
+    try:
+        payload = jwt.decode(token, secret, algorithms=JWT_ALGO)
         username: str = payload.get("sub")
         if username is None:
             raise InvalidTokenError
@@ -44,5 +58,8 @@ def get_user_from_token(token: str) -> TMUser:
     return user
 
 
-def get_oauth2_user(token: Annotated[str, Depends(cookie_scheme)]) -> TMUser:
-    return get_user_from_token(token)
+def get_current_user(token: Annotated[str, Depends(session_cookie)], settings: Annotated[Settings, Depends(get_settings)]) -> TMUser:
+    if is_token_expired(token, settings.jwt_auth_secret):
+        raise InvalidTokenError
+    return get_user_from_token(token, settings.jwt_auth_secret)
+

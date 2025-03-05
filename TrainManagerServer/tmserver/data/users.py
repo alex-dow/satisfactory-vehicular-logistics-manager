@@ -8,7 +8,7 @@ class TMUser(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(unique=True)
     password: str
-    
+
 
 def filter_user_password(user: TMUser) -> TMUser:
     return user.model_copy(update={"password": ""})

@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from typing import Annotated
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 
@@ -7,6 +8,7 @@ from tmserver.api.session import router as session_router
 from tmserver.api.users import router as users_router
 from tmserver.db.tables import init_db
 from tmserver.exc import InvalidTokenError
+from tmserver.settings import Settings, get_settings
 app = FastAPI(root_path="/api")
 
 
@@ -25,6 +27,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def on_startup():
+    # get_settings.cache_clear()
     init_db()
 
 app.include_router(projects_router)
