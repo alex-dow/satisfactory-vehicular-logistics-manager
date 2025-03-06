@@ -4,6 +4,7 @@ import { createApp } from "vue";
 import { VueQueryPlugin } from "@tanstack/vue-query";
 import { addIcons } from "oh-vue-icons";
 import { IoTrainSharp, BiDownload, BiUpload } from "oh-vue-icons/icons";
+import { MdInputTwotone, MdOutputTwotone } from "oh-vue-icons/icons";
 import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
 import Tooltip from "primevue/tooltip";
@@ -13,7 +14,7 @@ import "./sass/main.css";
 import router from "./router";
 
 const pinia = createPinia();
-addIcons(IoTrainSharp, BiDownload, BiUpload);
+addIcons(IoTrainSharp, BiDownload, BiUpload, MdInputTwotone, MdOutputTwotone);
 const app = createApp(App);
 app.use(VueQueryPlugin);
 app.use(router);

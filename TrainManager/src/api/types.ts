@@ -25,3 +25,5 @@ export interface TMProject {
   project_name: string;
   train_stations: TMTrainStation[];
 }
+
+export type ItemDirection = "input" | "output";

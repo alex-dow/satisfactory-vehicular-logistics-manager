@@ -7,29 +7,28 @@
       />
       <h3>Platform #{{ props.platformIndex + 1 }}</h3>
     </div>
-    <Button
-      icon="pi pi-trash"
-      variant="text"
-      severity="danger"
-      raised
-      rounded
-      aria-label="Remove platform"
-      size="small"
-      class="!h-6 !w-6"
-      @click="removePlatform()"
-    />
+    <div class="ml-auto">
+      <Button
+        icon="pi pi-trash"
+        variant="text"
+        severity="danger"
+        raised
+        rounded
+        aria-label="Remove platform"
+        size="small"
+        class="!h-6 !w-6"
+        @click="removePlatform()"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { Button } from "primevue";
 
-import type { TMTrainStation } from "@/api/types";
-
 import { useProjectStore } from "@/stores/useProjectStore";
 
 const props = defineProps<{
-  trainStation: TMTrainStation;
   stationIndex: number;
   platformIndex: number;
 }>();

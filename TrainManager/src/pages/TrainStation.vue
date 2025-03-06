@@ -9,46 +9,35 @@
       <h1 class="m-0 text-4xl font-bold">
         {{ trainStation.station_name }}
       </h1>
+      <Button
+        icon="pi pi-plus"
+        variant="outlined"
+        xseverity="success"
+        raised
+        rounded
+        size="large"
+        aria-label="Remove platform"
+        label="Add platform to station"
+        class="ml-auto"
+        @click="addPlatform"
+      />
     </div>
     <hr />
 
     <div class="flex">
-      <div class="md:w-full lg:w-8/12">
-        <div class="flex items-center justify-between p-2">
-          <!--
-          <div class="flex items-center gap-2">
-            <img
-              src="/data/items/desc-traindockingstation-c_64.png"
-              style="width: 32px; height: 32px"
-            />
-            <h2 class="text-3xl font-bold">Platforms</h2>
-          </div>
-        -->
-
-          <Button
-            icon="pi pi-plus"
-            variant="outlined"
-            xseverity="success"
-            raised
-            rounded
-            size="large"
-            aria-label="Remove platform"
-            label="Add platform to station"
-            @click="addPlatform"
-          />
-        </div>
+      <div class="w-full">
         <Platform
           v-for="(platform, idx) in trainStation.platforms"
           :key="'platform-' + stationIndex + '-' + idx"
-          :train-station="trainStation"
           :platform-index="idx"
           :station-index="stationIndex"
         />
       </div>
+      <!--
       <div class="w-4/12">
         <TrainNetworkOverview />
       </div>
-    </div>
+    --></div>
   </div>
 </template>
 

@@ -99,6 +99,10 @@ export const useProjectStore = defineStore("current-project", () => {
     ].outputs.splice(itemIndex, 1);
   };
 
+  const resetModifiedState = () => {
+    modified.value = false;
+  };
+
   return {
     project,
     modified,
@@ -111,5 +115,6 @@ export const useProjectStore = defineStore("current-project", () => {
     addPlatformOutput,
     removePlatformInput,
     removePlatformOutput,
+    resetModifiedState,
   };
 });

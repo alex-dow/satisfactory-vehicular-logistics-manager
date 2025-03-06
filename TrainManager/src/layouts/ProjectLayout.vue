@@ -4,23 +4,10 @@
       <h4 class="m-0 p-0 text-lg font-bold">
         {{ project?.project_name }}
       </h4>
-      <p class="m-0 p-0 text-xs">
-        <i v-if="!modified" class="pi pi-check text-green"></i>
-        <i v-else class="pi pi-save text-red" />
-        <VeProgress
-          :progress="saveTimerProgress"
-          :size="200"
-          animation="default 200 2000"
-          hide-legend
-          :loading="saveProject.isPending"
-        />
-        Modified: {{ modified }} - Save: {{ saveCounter }} - Progress:
-        {{ saveTimerProgress }}% status: {{ saveProject.status }} - isPending:
-        {{ saveProject.isPending }} - isSuccess: {{ saveProject.isSuccess }} -
-        isError: {{ saveProject.isError }}
-      </p>
+      <ProjectAutoSave :interval="5" />
     </div>
-    <Splitter class="w-full">
+
+    <Splitter class="w-full flex-grow">
       <SplitterPanel :size="25">
         <div class="flex w-full items-center border-b-2 border-b-orange-500">
           <div class="mr-1">
@@ -119,9 +106,9 @@ import {
   useConfirm,
   Checkbox,
 } from "primevue";
-import { VeProgress } from "vue-ellipse-progress";
 
-import { useProject, useSaveProject } from "@/api/useProjects";
+import { useProject } from "@/api/useProjects";
+import ProjectAutoSave from "@/components/ProjectAutoSave.vue";
 import AddTrainStationDialog from "@/modals/AddTrainStationDialog.vue";
 import { useProjectStore } from "@/stores/useProjectStore";
 const confirm = useConfirm();
@@ -139,14 +126,15 @@ const { data, isLoading } = useProject(projectId.value);
 
 watch(
   data,
-  () => {
-    console.log("<ProjectLayout> Server state changed, updating store");
-    projectStore.setCurrentProject(data.value || null);
+  (newVal, oldVal) => {
+    console.log("<ProjectLayout> Server state changed");
+    if (newVal?.id != oldVal?.id) {
+      console.log("<ProjectLayout> Project id changed, update store");
+      projectStore.setCurrentProject(data.value || null);
+    }
   },
   { immediate: true },
 );
-
-const saveProject = useSaveProject();
 
 const confirmDeleteTrainStation = (event: MouseEvent, stationIdx: number) => {
   confirm.require({
@@ -181,41 +169,6 @@ const trainStations = computed(() => {
 const deleteTrainStation = async (stationIdx: number) => {
   projectStore.removeTrainStation(stationIdx);
 };
-
-const saveTimerLength = 10000; // 10 seconds
-let saveTimer: number | null = null;
-
-const saveCounter = ref(saveTimerLength);
-
-const saveTimerProgress = computed(() => {
-  return Math.ceil(
-    (parseFloat(saveCounter.value) / parseFloat(saveTimerLength)) * 100,
-  );
-});
-
-const startSaveTimer = () => {
-  stopSaveTimer();
-  saveCounter.value = saveTimerLength;
-  saveTimer = setInterval(async () => {
-    saveCounter.value -= 1000;
-    if (saveCounter.value === 0) {
-      stopSaveTimer();
-      await saveProject.mutateAsync(project.value);
-      startSaveTimer();
-    }
-  }, 1000);
-};
-
-const stopSaveTimer = () => {
-  if (saveTimer != null) {
-    clearInterval(saveTimer);
-    saveTimer = null;
-  }
-};
-
-onBeforeMount(startSaveTimer);
-
-onBeforeUnmount(stopSaveTimer);
 
 onBeforeRouteLeave((to, from) => {
   if (modified.value === true) {
