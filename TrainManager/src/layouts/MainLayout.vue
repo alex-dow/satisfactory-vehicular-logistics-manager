@@ -1,5 +1,11 @@
 <template>
-  <Menubar :model="items" />
+  <Menubar :model="items">
+    <template #end>
+      <p>
+        Welcome back <strong>{{ sessionStore.currentUsername }}</strong>
+      </p>
+    </template>
+  </Menubar>
   <p v-if="loading">Loading</p>
   <p v-else-if="errorLoading">Error occurred loading data!</p>
   <router-view v-if="loaded" />
@@ -14,13 +20,12 @@ import { Menubar } from "primevue";
 import type { MenuItem } from "primevue/menuitem";
 
 import { useSatisfactoryStore } from "@/stores/useSatisfactoryStore";
-import { useTrainStore } from "@/stores/useTrainStore";
+import { useSessionStore } from "@/stores/useSessionStore";
 
 const sfyStore = useSatisfactoryStore();
-const trainStore = useTrainStore();
+const sessionStore = useSessionStore();
 
 sfyStore.refresh();
-trainStore.refresh();
 
 const router = useRouter();
 
@@ -50,7 +55,7 @@ const refresh = async () => {
   errorLoading.value = false;
   loaded.value = false;
   try {
-    await Promise.all([sfyStore.refresh(), trainStore.refresh()]);
+    await Promise.all([sfyStore.refresh()]);
     loaded.value = true;
   } catch (err) {
     errorLoading.value = true;

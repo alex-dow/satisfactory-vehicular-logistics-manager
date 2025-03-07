@@ -8,8 +8,7 @@ import HomePage from "./pages/HomePage.vue";
 import LoginPage from "./pages/LoginPage.vue";
 import ProjectPage from "./pages/ProjectPage.vue";
 import ProjectsPage from "./pages/ProjectsPage.vue";
-import TrainStation from "./pages/TrainStation.vue";
-import TrainStationsListPage from "./pages/TrainStationsList.vue";
+import TrainStationPage from "./pages/TrainStationPage.vue";
 
 const routes = [
   {
@@ -28,13 +27,8 @@ const routes = [
             name: "project",
           },
           {
-            path: "train-stations",
-            component: TrainStationsListPage,
-            name: "train-stations",
-          },
-          {
             path: "train-stations/:stationIndex",
-            component: TrainStation,
+            component: TrainStationPage,
             name: "train-station",
           },
         ],
