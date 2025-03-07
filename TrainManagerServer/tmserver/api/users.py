@@ -2,9 +2,11 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
+from httpx import get
 from pydantic import BaseModel, Field
 import sqlalchemy
-from tmserver.data.users import TMUser, filter_user_password, get_users,delete_user , create_user
+from tmserver.data.users import TMUser, filter_user_password, get_user, get_users,delete_user , create_user, save_user
+from tmserver.security.hashing import hash_password
 from tmserver.security.tokens import get_current_user
 
 router = APIRouter()
@@ -13,6 +15,8 @@ class CreateUserRequest(BaseModel):
     username: str = Field(min_length=4)
     password: str = Field(min_length=4)
 
+class UpdatePasswordRequest(BaseModel):
+    password: str = Field(min_length=4)
 
 @router.post("/users")
 def api_create_user(req: CreateUserRequest) -> TMUser:
@@ -24,8 +28,8 @@ def api_create_user(req: CreateUserRequest) -> TMUser:
 
 
 @router.get("/users")
-def api_get_all_users(user: Annotated[TMUser, Depends(get_current_user)]):
-    if user.id is not None and user.id > 1:
+def api_get_all_users(currentUser: Annotated[TMUser, Depends(get_current_user)]):
+    if currentUser.id is not None and currentUser.id > 1:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     users = list(map(filter_user_password, get_users()))
@@ -34,11 +38,25 @@ def api_get_all_users(user: Annotated[TMUser, Depends(get_current_user)]):
 
 
 @router.delete("/users/{user_id}")
-def api_delete_user(user_id: int, user: Annotated[TMUser, Depends(get_current_user)]):
-    if user.id is not None and user.id > 1:
+def api_delete_user(user_id: int, currentUser: Annotated[TMUser, Depends(get_current_user)]):
+    if currentUser.id is not None and currentUser.id > 1:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     if user_id == 1:
         raise HTTPException(status_code=409, detail="Can't delete this user")
 
     delete_user(user_id=user_id)
+
+
+@router.put("/users/{user_id}/password")
+def api_update_user_password(user_id: int, req: UpdatePasswordRequest, currentUser: Annotated[TMUser, Depends(get_current_user)]):
+
+    user = get_user(user_id=user_id)
+    if user == None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if currentUser.id != 1 or user.id != user_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    user.password = hash_password(req.password)
+    user = save_user(user)

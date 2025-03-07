@@ -14,7 +14,8 @@ def filter_user_password(user: TMUser) -> TMUser:
     return user.model_copy(update={"password": ""})
 
 
-def get_user(username: str | None = None, user_id: int | None = None) -> TMUser:
+
+def get_user(username: str | None = None, user_id: int | None = None) -> TMUser | None:
 
     with Session(engine) as session:
 
@@ -27,11 +28,9 @@ def get_user(username: str | None = None, user_id: int | None = None) -> TMUser:
             raise RuntimeError("Must provide a username or user_id")
 
         user = session.exec(s).first()
-        print("found user: %s" % user)
-        if user is None:
-            raise InvalidUserError
 
         return user
+
 
 
 def get_users():
@@ -39,6 +38,15 @@ def get_users():
         statement = select(TMUser)
         return [filter_user_password(user) for user in session.exec(statement).all()]
 
+def save_user(user: TMUser) -> TMUser:
+    with Session(engine) as session:
+        
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        
+
+        return user
 
 def create_user(username: str, password: str) -> TMUser:
     with Session(engine) as session:

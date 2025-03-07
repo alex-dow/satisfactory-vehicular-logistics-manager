@@ -55,6 +55,10 @@ def get_user_from_token(token: str, secret: str) -> TMUser:
         raise InvalidTokenError
 
     user = get_user(username)
+    if user == None:
+        raise InvalidTokenError()
+
+        
     return user
 
 

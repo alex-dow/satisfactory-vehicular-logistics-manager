@@ -48,6 +48,8 @@ def login(req: LoginRequest, response: Response, settings: Annotated[Settings, D
     logger = logging.getLogger(__name__)
     try:
         user = get_user(username=req.username)
+        if user == None:
+            raise InvalidUserError()
         if verify_password(req.password, user.password):
 
             print("auth secret: %s" % settings.jwt_auth_secret)

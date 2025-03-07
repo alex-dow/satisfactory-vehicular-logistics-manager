@@ -5,6 +5,7 @@ from sqlmodel import Field, SQLModel, Session, select
 import json
 
 from tmserver.data.trainStations import TMTrainStation
+from tmserver.data.truckStations import TMTruckStation
 from tmserver.data.users import TMUser
 from tmserver.db.conn import engine
 from tmserver.exc import InvalidProjectError
@@ -16,6 +17,7 @@ class ProjectEntry(SQLModel, table=True):
     owner_id: int
     project_name: str
     train_stations: str
+    truck_stations: str
 
 
 class TMProject(BaseModel):
@@ -23,6 +25,7 @@ class TMProject(BaseModel):
     owner_id: int
     project_name: str
     train_stations: List[TMTrainStation]
+    truck_stations: List[TMTruckStation]
 
 
 class TMPartialProject(BaseModel):
@@ -38,6 +41,7 @@ def get_project(project_id: int) -> TMProject:
         if res != None:
 
             train_stations = []
+            truck_stations = []
             
             if res.train_stations != None:
                 res_train_stations = json.loads(res.train_stations)
@@ -49,7 +53,15 @@ def get_project(project_id: int) -> TMProject:
                 
                 train_stations = [TMTrainStation(**train_station) for train_station in res_train_stations]
 
-            project = TMProject(id=res.id, project_name=res.project_name, train_stations=train_stations, owner_id=res.owner_id)
+            if res.truck_stations != None:
+                res_truck_stations = json.loads(res.truck_stations)
+
+                if (type(res_truck_stations) is not list):
+                    raise RuntimeError("Project #%i has invalid truck stations" % project_id)
+                
+                truck_stations = [TMTruckStation(**truck_station) for truck_station in res_truck_stations]
+
+            project = TMProject(id=res.id, project_name=res.project_name, truck_stations=truck_stations, train_stations=train_stations, owner_id=res.owner_id)
             return project
     raise RuntimeError("Project id %i not found" % project_id)
 
@@ -81,7 +93,8 @@ def create_project(project_name: str, owner_id: int) -> TMProject:
         project_entry = ProjectEntry(
             owner_id=owner_id,
             project_name=project_name,
-            train_stations='[]'
+            train_stations='[]',
+            truck_stations='[]'
         )
 
         session.add(project_entry)
