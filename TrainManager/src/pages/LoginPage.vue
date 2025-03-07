@@ -1,9 +1,9 @@
 <template>
   <form class="w-full space-y-8" @submit.prevent="onSubmit">
-    <ProgressSpinner v-if="login.isPending.value" class="text-center" />
+    <ProgressSpinner v-if="state.isPending" class="text-center" />
     <template v-else>
       <h3 class="text-center text-2xl font-bold">Sign in to your account</h3>
-      <Message v-if="login.isError.value" severity="error"
+      <Message v-if="state.isError" severity="error"
         >Invalid username or password.</Message
       >
       <FloatLabel>
@@ -11,7 +11,7 @@
           id=" username"
           v-model="formData.username"
           class="w-full"
-          :disabled="login.isPending.value"
+          :disabled="state.isPending"
         />
         <label for="username">Username</label>
       </FloatLabel>
@@ -21,7 +21,7 @@
           v-model="formData.password"
           toggle-mask
           :feedback="false"
-          :disabled="login.isPending.value"
+          :disabled="state.isPending"
           fluid
           :pt="{
             pcInputText: {
@@ -58,7 +58,9 @@ import {
   ProgressSpinner,
 } from "primevue";
 
-import { useLogin } from "@/api/useLogin";
+import { useSessionStore } from "@/stores/useSessionStore";
+
+const sessionStore = useSessionStore();
 
 const formData = reactive<{
   username: string;
@@ -68,13 +70,27 @@ const formData = reactive<{
   password: "",
 });
 
-const login = useLogin();
 const router = useRouter();
 
+const state = reactive({
+  isPending: false,
+  isError: false,
+  isSuccess: false,
+  isIdle: true,
+});
+
 const onSubmit = async () => {
-  await login.mutateAsync(formData);
-  if (login.isSuccess) {
+  state.isPending = true;
+  state.isError = false;
+  state.isSuccess = false;
+  try {
+    await sessionStore.login(formData.username, formData.password);
+    state.isSuccess = true;
     router.push("/projects");
+  } catch (err) {
+    console.error(err);
+    state.isError = true;
   }
+  state.isPending = false;
 };
 </script>

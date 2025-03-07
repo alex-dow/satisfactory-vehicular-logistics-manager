@@ -19,11 +19,25 @@ export interface TMTrainStation {
   platforms: TMPlatform[];
 }
 
+export interface TMTruckStation {
+  station_name: string;
+  inputs: TMPlatformItem[];
+  outputs: TMPlatformItem[];
+}
+
+export interface TMDroneStation {
+  station_name: string;
+  inputs: TMPlatformItem[];
+  outputs: TMPlatformItem[];
+}
+
 export interface TMProject {
   id: number;
   owner_id: number;
   project_name: string;
   train_stations: TMTrainStation[];
+  truck_stations: TMTruckStation[];
+  drone_stations: TMDroneStation[];
 }
 
 export type ItemDirection = "input" | "output";

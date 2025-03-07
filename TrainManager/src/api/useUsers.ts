@@ -60,3 +60,23 @@ export const useDeleteUser = () => {
     },
   });
 };
+
+export const useUpdateUserPassword = () => {
+  return useMutation({
+    mutationFn: async (params: { userId: number; password: string }) => {
+      const { password, userId } = params;
+      const res = await fetch(
+        "/api/users/" + encodeURIComponent(userId) + "/password",
+        {
+          method: "put",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ password }),
+        },
+      );
+
+      if (res.status >= 400) {
+        throw new Error("Failed to update password");
+      }
+    },
+  });
+};

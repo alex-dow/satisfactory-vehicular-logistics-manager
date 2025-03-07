@@ -2,11 +2,13 @@
   <div
     class="tm-platform-item-container relative flex gap-2 p-0.5 hover:bg-orange-950"
   >
-    <div class="bg-surface-300" style="width: 24px; height: 24px"></div>
-    <div class="w-6/12 overflow-hidden text-ellipsis" :title="item?.item_id">
-      {{ item?.item_id }}
+    <div class="bg-surface-900" style="width: 32px; height: 32px">
+      <img :src="'/data/items/' + items[item.item_id].icon + '_64.png'" />
     </div>
-    <div class="w-6/12">{{ item?.rate }}/min</div>
+    <div class="w-8/12 overflow-hidden text-ellipsis" :title="item?.item_id">
+      {{ items[item?.item_id].name }}
+    </div>
+    <div class="ml-auto">{{ item?.rate }}/min</div>
     <div
       class="tm-overlay absolute left-0 right-0 hidden text-right"
       :title="item?.item_id"
@@ -14,7 +16,6 @@
       <Button
         v-tooltip="{ value: 'Delete this item', showDelay: 500 }"
         icon="pi pi-trash"
-        variant="outlined"
         severity="danger"
         aria-label="Delete item"
         size="small"
@@ -101,6 +102,7 @@ import { Button } from "primevue";
 import type { ItemDirection } from "@/api/types";
 
 import { useProjectStore } from "@/stores/useProjectStore";
+import { useSatisfactoryStore } from "@/stores/useSatisfactoryStore";
 
 const props = defineProps<{
   stationIndex: number;
@@ -110,7 +112,11 @@ const props = defineProps<{
 }>();
 
 const projectStore = useProjectStore();
+
 const { project } = storeToRefs(projectStore);
+
+const sfyStore = useSatisfactoryStore();
+const { items } = storeToRefs(sfyStore);
 
 const station = computed(() => {
   return project.value?.train_stations[props.stationIndex];

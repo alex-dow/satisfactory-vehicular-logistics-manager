@@ -5,7 +5,7 @@
     header="Create a New Project"
     @show="formData.projectName = ''"
   >
-    <Message v-if="createProject.isError" severity="error" class="mb-2">
+    <Message v-if="createProject.isError.value" severity="error" class="mb-2">
       <div class="flex items-center gap-2">
         <i class="pi pi-times-circle" />{{ createProject.error }}
       </div>
@@ -17,6 +17,7 @@
         type="text"
         required
         autofocus
+        placeholder="Project name"
       />
       <div class="mt-2 flex justify-end gap-2">
         <Button
@@ -25,7 +26,11 @@
           severity="secondary"
           @click="visible = false"
         ></Button>
-        <Button type="submit" label="Create"></Button>
+        <Button
+          type="submit"
+          label="Create"
+          :disabled="!formData.projectName"
+        ></Button>
       </div>
     </form>
   </Dialog>

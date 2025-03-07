@@ -91,6 +91,9 @@ export const useDeleteProject = () => {
     mutationFn: async (projectId: number) => {
       const res = await clientFetch(
         "/api/projects/" + encodeURIComponent(projectId),
+        {
+          method: "delete",
+        },
       );
       if (res.status >= 400) {
         throw new Error("Failed to delete project");

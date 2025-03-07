@@ -7,6 +7,7 @@ import { IoTrainSharp, BiDownload, BiUpload } from "oh-vue-icons/icons";
 import { MdInputTwotone, MdOutputTwotone } from "oh-vue-icons/icons";
 import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
+import ToastService from "primevue/toastservice";
 import Tooltip from "primevue/tooltip";
 
 import App from "./App.vue";
@@ -21,5 +22,6 @@ app.use(router);
 app.use(pinia);
 app.use(PrimeVue, { theme: "none" });
 app.directive("tooltip", Tooltip);
+app.use(ToastService);
 app.use(ConfirmationService);
 app.mount("#app");

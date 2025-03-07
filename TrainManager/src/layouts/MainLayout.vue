@@ -2,20 +2,50 @@
   <Menubar :model="items">
     <template #end>
       <p>
-        Welcome back <strong>{{ sessionStore.currentUsername }}</strong>
+        Welcome back <strong @click="toggle">{{ currentUsername }}</strong>
       </p>
     </template>
   </Menubar>
+  <Popover ref="op">
+    <div class="flex gap-2">
+      <Button
+        severity="success"
+        size="small"
+        @click="
+          (e) => {
+            toggle(e);
+            router.push({ name: 'profile' });
+          }
+        "
+      >
+        Profile
+      </Button>
+      <Button
+        severity="warn"
+        size="small"
+        @click="
+          (e) => {
+            toggle(e);
+            onLogout();
+          }
+        "
+      >
+        Logout
+      </Button>
+    </div>
+  </Popover>
+
   <p v-if="loading">Loading</p>
   <p v-else-if="errorLoading">Error occurred loading data!</p>
   <router-view v-if="loaded" />
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { Menubar } from "primevue";
+import { Button, Menubar, Popover } from "primevue";
 
 import type { MenuItem } from "primevue/menuitem";
 
@@ -24,7 +54,8 @@ import { useSessionStore } from "@/stores/useSessionStore";
 
 const sfyStore = useSatisfactoryStore();
 const sessionStore = useSessionStore();
-
+const { currentUsername } = storeToRefs(sessionStore);
+const op = ref();
 sfyStore.refresh();
 
 const router = useRouter();
@@ -68,4 +99,14 @@ const refresh = async () => {
 onBeforeMount(() => {
   refresh();
 });
+
+const toggle = (event) => {
+  op.value.toggle(event);
+};
+
+const onLogout = async () => {
+  await sessionStore.logout();
+  window.location.reload();
+  router.push({ name: "login" });
+};
 </script>

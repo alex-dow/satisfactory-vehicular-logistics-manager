@@ -1,16 +1,47 @@
 <template>
-  <div class="m-2 flex gap-2 bg-surface-800 p-2">
-    <div class="flex w-3/12 flex-col">
-      <div class="relative flex items-center">
-        <img
-          src="/data/items/desc-traindockingstation-c_64.png"
-          style="width: 24px; height: 24px"
+  <div class="relative m-2 flex gap-2 p-2">
+    <div class="flex flex-col bg-surface-800 p-2">
+      <div class="relative">
+        <div
+          class="overflow-hidden rounded-full bg-slate-950"
+          style="width: 64px"
+        >
+          <img
+            src="/data/items/desc-traindockingstation-c_64.png"
+            style="width: 64px; height: 64px"
+          />
+        </div>
+        <div
+          class="absolute left-0 top-0 text-center text-6xl font-extrabold text-orange-200"
+          style="width: 64px; height: 64px"
+        >
+          {{ platformNumber }}
+        </div>
+        <Button
+          v-tooltip="{ value: 'Delete platform', showDelay: 500 }"
+          icon="pi pi-trash"
+          severity="danger"
+          aria-label="Delete item"
+          label="Delete"
+          variant="outlined"
+          size="small"
+          class="pb-0.5 pl-1 pr-1 pt-0.5 text-xs"
+          @click="() => onDeletePlatform()"
         />
+        <!--
         <div>Platform #{{ platformNumber }}</div>
-        <div class="absolute left-0 right-0 text-right">D</div>
-      </div>
+        <div class="text-right">
+          <Button
+            size="small"
+            icon="pi pi-trash"
+            outlined
+            severity="danger"
+            class="w-7 pb-0.5 pl-0 pr-0 pt-0.5 text-xs"
+          />
+        </div>
+      --></div>
     </div>
-    <div class="flex w-4/12 flex-col gap-1">
+    <div class="flex w-1/2 flex-col gap-1 bg-surface-800 p-2">
       <PlatformItemDirectionHeader
         direction="input"
         @add-item="() => onAddItem('input')"
@@ -24,7 +55,7 @@
         item-direction="input"
       />
     </div>
-    <div class="flex w-5/12 flex-col gap-1">
+    <div class="flex w-1/2 flex-col gap-1 bg-surface-800 p-2">
       <PlatformItemDirectionHeader
         direction="output"
         @add-item="() => onAddItem('output')"
@@ -52,13 +83,10 @@
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 
-import { OhVueIcon } from "oh-vue-icons";
-import { Button, InputNumber } from "primevue";
+import { Button } from "primevue";
 
-import PlatformHeader from "./PlatformHeader.vue";
 import PlatformItem from "./PlatformItem.vue";
 import PlatformItemDirectionHeader from "./PlatformItemDirectionHeader.vue";
-import SingleItemAutocomplete from "./SingleItemAutocomplete.vue";
 
 import type { ItemDirection } from "@/api/types";
 
@@ -92,4 +120,8 @@ const station = computed(() => {
 const platform = computed(() => {
   return station.value?.platforms[props.platformIndex];
 });
+
+const onDeletePlatform = () => {
+  projectStore.removePlatform(props.stationIndex, props.platformIndex);
+};
 </script>

@@ -2,12 +2,13 @@
   <p v-if="loading"></p>
   <router-view v-else-if="loaded" />
   <ConfirmPopup></ConfirmPopup>
+  <Toast />
 </template>
 <script lang="ts" setup>
 import { onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { ConfirmPopup } from "primevue";
+import { ConfirmPopup, Toast } from "primevue";
 
 import { useSatisfactoryStore } from "./stores/useSatisfactoryStore";
 import { useSessionStore } from "./stores/useSessionStore";

@@ -22,7 +22,7 @@ export const useSessionStore = defineStore("session", () => {
   };
 
   const logout = async () => {
-    const logoutRes = await fetch("/api/logout");
+    const logoutRes = await fetch("/api/logout", { method: "post" });
     if (logoutRes.status >= 400) {
       throw new Error("Failed to logout");
     }
@@ -32,13 +32,12 @@ export const useSessionStore = defineStore("session", () => {
   };
 
   const login = async (username: string, password: string) => {
-    const formData = new FormData();
-    formData.set("username", username);
-    formData.set("password", password);
-
     const loginRes = await fetch("/api/login", {
       method: "post",
-      body: formData,
+      body: JSON.stringify({ username, password }),
+      headers: {
+        "content-type": "application/json",
+      },
     });
 
     if (loginRes.status >= 400) {
