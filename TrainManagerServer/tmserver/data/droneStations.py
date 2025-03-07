@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from tmserver.data.trainStations import TMPlatformItem
 
 
-class TMTruckStation(BaseModel):
+class TMDroneStation(BaseModel):
 
     station_name: str
     """Truck station name"""
