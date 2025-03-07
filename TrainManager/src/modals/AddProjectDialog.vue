@@ -5,6 +5,12 @@
     header="Create a New Project"
     @show="formData.projectName = ''"
   >
+    <Message v-if="createProject.isError" severity="error" class="mb-2">
+      <div class="flex items-center gap-2">
+        <i class="pi pi-times-circle" />{{ createProject.error }}
+      </div>
+    </Message>
+
     <form @submit.prevent="onSubmit">
       <InputText
         v-model="formData.projectName"
@@ -29,7 +35,7 @@
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
 
-import { Dialog, InputText, Button } from "primevue";
+import { Dialog, InputText, Button, Message } from "primevue";
 
 import { useCreateProject } from "@/api/useProjects";
 
