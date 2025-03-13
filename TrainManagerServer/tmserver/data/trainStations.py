@@ -1,5 +1,6 @@
-from typing import List, Optional
+from typing import List, Optional, Literal
 from pydantic import BaseModel
+
 
 
 
@@ -19,11 +20,11 @@ class TMPlatformItem(BaseModel):
 class TMPlatform(BaseModel):
     """Class that represents a platform of a station"""
 
-    inputs: List[TMPlatformItem]
-    """List of inputs (items that trains unload to the platform)"""
+    mode: Literal['load', 'unload']
+    """ Denotes whether the platform is loading or unloading trains."""
 
-    outputs: List[TMPlatformItem]
-    """List of outputs (items that trains pick up from a platform) """
+    items: List[TMPlatformItem]
+    """ List of items that are loaded or unloaded by this platform """
 
 
 
