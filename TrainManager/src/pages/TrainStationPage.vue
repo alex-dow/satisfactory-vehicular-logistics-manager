@@ -24,8 +24,8 @@
     </div>
     <hr />
 
-    <div class="flex">
-      <div class="w-full">
+    <div class="flex gap-2">
+      <div class="flex w-5/12 flex-col gap-4">
         <Platform
           v-for="(platform, idx) in trainStation.platforms"
           :key="'platform-' + stationIndex + '-' + idx"
@@ -33,11 +33,11 @@
           :station-index="stationIndex"
         />
       </div>
-      <!--
-      <div class="w-4/12">
+
+      <div class="w-7/12">
         <TrainNetworkOverview />
       </div>
-    --></div>
+    </div>
   </div>
 </template>
 
@@ -49,6 +49,7 @@ import { useRoute } from "vue-router";
 import { Button } from "primevue";
 
 import Platform from "@/components/Platform.vue";
+import TrainNetworkOverview from "@/components/TrainNetworkOverview.vue";
 import { useProjectStore } from "@/stores/useProjectStore";
 
 const route = useRoute();

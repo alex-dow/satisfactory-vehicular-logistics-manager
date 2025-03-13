@@ -5,13 +5,18 @@
     <div class="bg-surface-900" style="width: 56px; height: 56px">
       <img :src="'/data/items/' + items[item.item_id].icon + '_64.png'" />
     </div>
-    <div class="w-8/12 overflow-hidden text-ellipsis" :title="item?.item_id">
-      {{ items[item?.item_id].name }}
-    </div>
-    <div class="ml-auto">
-      <span v-if="platform?.mode === 'load'">Provides </span>
-      <span v-else>Consumes </span>
-      <span>{{ item?.rate }}/min</span>
+    <div class="flex flex-col" :title="item?.item_id">
+      <div class="overflow-hidden text-ellipsis">
+        {{ items[item?.item_id].name }}
+      </div>
+      <div>
+        {{
+          (platform.mode === "load" ? "Loading " : "Unloading") +
+          " " +
+          item?.rate +
+          "/min"
+        }}
+      </div>
     </div>
     <div
       class="tm-overlay absolute left-0 right-0 hidden text-right"
