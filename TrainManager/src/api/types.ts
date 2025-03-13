@@ -10,8 +10,8 @@ export interface TMPlatformItem {
 }
 
 export interface TMPlatform {
-  inputs: TMPlatformItem[];
-  outputs: TMPlatformItem[];
+  mode: TMPlatformMode;
+  items: TMPlatformItem[];
 }
 
 export interface TMTrainStation {
@@ -21,8 +21,8 @@ export interface TMTrainStation {
 
 export interface TMTruckStation {
   station_name: string;
-  inputs: TMPlatformItem[];
-  outputs: TMPlatformItem[];
+  direction: TMPlatformMode;
+  items: TMPlatformItem[];
 }
 
 export interface TMDroneStation {
@@ -40,4 +40,4 @@ export interface TMProject {
   drone_stations: TMDroneStation[];
 }
 
-export type ItemDirection = "input" | "output";
+export type TMPlatformMode = "load" | "unload";

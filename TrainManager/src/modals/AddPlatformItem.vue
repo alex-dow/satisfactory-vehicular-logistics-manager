@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:visible="visible" modal :header="header" @show="onShow">
+  <Dialog v-model:visible="visible" modal header="Add item" @show="onShow">
     <form class="flex flex-col gap-2" @submit.prevent="onSubmit">
       <SingleItemSelect id="input-item" v-model="formData.item" />
 
@@ -26,51 +26,38 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive } from "vue";
-import { useRouter } from "vue-router";
+import { reactive } from "vue";
 
 import { Dialog, Button, InputNumber, IftaLabel } from "primevue";
 
-import type { ItemDirection } from "@/api/types";
 import type { BasicItem } from "@/satisfactory/types";
 
-import SingleItemAutocomplete from "@/components/SingleItemAutocomplete.vue";
 import SingleItemSelect from "@/components/SingleItemSelect.vue";
 import { useProjectStore } from "@/stores/useProjectStore";
 
 const visible = defineModel<boolean>();
 
 const props = defineProps<{
-  direction: ItemDirection;
   stationIndex: number;
   platformIndex: number;
 }>();
 
 const projectStore = useProjectStore();
 
-const header = computed(() => {
-  return props.direction === "input" ? "Add input item" : "Add output item";
-});
-
 const formData = reactive<{
-  item?: BasicItem | null;
-  rate?: number;
+  item?: BasicItem;
+  rate: number;
 }>({
   rate: 0,
 });
 
 const onSubmit = async () => {
-  if (props.direction === "input") {
-    projectStore.addPlatformInput(props.stationIndex, props.platformIndex, {
-      item_id: formData.item?.id,
-      rate: formData.rate,
-    });
-  } else if (props.direction === "output") {
-    projectStore.addPlatformOutput(props.stationIndex, props.platformIndex, {
-      item_id: formData.item?.id,
-      rate: formData.rate,
-    });
-  }
+  if (!formData.item) return;
+
+  projectStore.addPlatformItem(props.stationIndex, props.platformIndex, {
+    item_id: formData.item.id,
+    rate: formData.rate,
+  });
 
   visible.value = false;
 };

@@ -2,10 +2,13 @@
   <form class="w-full space-y-8" @submit.prevent="onSubmit">
     <ProgressSpinner v-if="state.isPending" class="text-center" />
     <template v-else>
-      <h3 class="text-center text-2xl font-bold">Sign in to your account</h3>
-      <Message v-if="state.isError" severity="error"
-        >Invalid username or password.</Message
-      >
+      <h3 class="text-center text-2xl font-bold">
+        To use this tool, you will need to create an account. No email address
+        is required.
+      </h3>
+      <Message v-if="state.isError" severity="error">
+        Invalid username or password.
+      </Message>
       <FloatLabel>
         <InputText
           id=" username"
@@ -38,8 +41,9 @@
         <router-link to="/create-user">create an account</router-link>. No email
         address required.
       </p>
-      <div class="text-center">
-        <Button type="submit" variant="outlined"> Login </Button>
+      <div class="flex justify-center gap-2 text-center">
+        <Button variant="outlined"> Create account</Button>
+        <Button type="submit"> Login </Button>
       </div>
     </template>
   </form>

@@ -1,7 +1,12 @@
 import { defineStore } from "pinia";
 import { ref, watch } from "vue";
 
-import type { TMPlatform, TMPlatformItem, TMProject } from "@/api/types";
+import type {
+  TMPlatform,
+  TMPlatformItem,
+  TMPlatformMode,
+  TMProject,
+} from "@/api/types";
 
 export const useProjectStore = defineStore("current-project", () => {
   const modified = ref(false);
@@ -29,6 +34,29 @@ export const useProjectStore = defineStore("current-project", () => {
     project.value?.train_stations.splice(stationIndex, 1);
   };
 
+  const togglePlatformMode = (stationIndex: number, platformIndex: number) => {
+    if (!project.value) return;
+    if (
+      project.value.train_stations[stationIndex].platforms[platformIndex]
+        .mode === "load"
+    ) {
+      setPlatformMode(stationIndex, platformIndex, "unload");
+    } else {
+      setPlatformMode(stationIndex, platformIndex, "load");
+    }
+  };
+
+  const setPlatformMode = (
+    stationIndex: number,
+    platformIndex: number,
+    mode: TMPlatformMode,
+  ) => {
+    modified.value = true;
+    if (!project.value) return;
+    project.value.train_stations[stationIndex].platforms[platformIndex].mode =
+      mode;
+  };
+
   const addPlatform = (stationIndex: number) => {
     modified.value = true;
     if (project.value === null) {
@@ -42,8 +70,8 @@ export const useProjectStore = defineStore("current-project", () => {
     }
 
     project.value?.train_stations[stationIndex].platforms.push({
-      inputs: [],
-      outputs: [],
+      items: [],
+      mode: "load",
     });
   };
 
@@ -55,7 +83,7 @@ export const useProjectStore = defineStore("current-project", () => {
     );
   };
 
-  const addPlatformInput = (
+  const addPlatformItem = (
     stationIndex: number,
     platformIndex: number,
     item: TMPlatformItem,
@@ -63,21 +91,10 @@ export const useProjectStore = defineStore("current-project", () => {
     modified.value = true;
     project.value?.train_stations[stationIndex].platforms[
       platformIndex
-    ].inputs.push(item);
+    ].items.push(item);
   };
 
-  const addPlatformOutput = (
-    stationIndex: number,
-    platformIndex: number,
-    item: TMPlatformItem,
-  ) => {
-    modified.value = true;
-    project.value?.train_stations[stationIndex].platforms[
-      platformIndex
-    ].outputs.push(item);
-  };
-
-  const removePlatformInput = (
+  const removePlatformItem = (
     stationIndex: number,
     platformIndex: number,
     itemIndex: number,
@@ -85,22 +102,54 @@ export const useProjectStore = defineStore("current-project", () => {
     modified.value = true;
     project.value?.train_stations[stationIndex].platforms[
       platformIndex
-    ].inputs.splice(itemIndex, 1);
-  };
-
-  const removePlatformOutput = (
-    stationIndex: number,
-    platformIndex: number,
-    itemIndex: number,
-  ) => {
-    modified.value = true;
-    project.value?.train_stations[stationIndex].platforms[
-      platformIndex
-    ].outputs.splice(itemIndex, 1);
+    ].items.splice(itemIndex, 1);
   };
 
   const resetModifiedState = () => {
     modified.value = false;
+  };
+
+  const movePlatformUp = (stationIndex: number, platformIndex: number) => {
+    if (platformIndex == 0) {
+      return;
+    }
+
+    const platform =
+      project.value?.train_stations[stationIndex].platforms[platformIndex];
+
+    project.value?.train_stations[stationIndex].platforms.splice(
+      platformIndex,
+      1,
+    );
+    project.value?.train_stations[stationIndex].platforms.splice(
+      platformIndex - 1,
+      0,
+      platform,
+    );
+    modified.value = true;
+  };
+
+  const movePlatformDown = (stationIndex: number, platformIndex: number) => {
+    if (
+      platformIndex >=
+      project.value?.train_stations[stationIndex].platforms.length - 1
+    ) {
+      return;
+    }
+
+    const platform =
+      project.value?.train_stations[stationIndex].platforms[platformIndex];
+
+    project.value?.train_stations[stationIndex].platforms.splice(
+      platformIndex,
+      1,
+    );
+    project.value?.train_stations[stationIndex].platforms.splice(
+      platformIndex + 1,
+      0,
+      platform,
+    );
+    modified.value = true;
   };
 
   return {
@@ -111,10 +160,12 @@ export const useProjectStore = defineStore("current-project", () => {
     addTrainStation,
     removeTrainStation,
     removePlatform,
-    addPlatformInput,
-    addPlatformOutput,
-    removePlatformInput,
-    removePlatformOutput,
+    addPlatformItem,
+    removePlatformItem,
     resetModifiedState,
+    setPlatformMode,
+    togglePlatformMode,
+    movePlatformUp,
+    movePlatformDown,
   };
 });

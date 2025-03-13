@@ -1,14 +1,18 @@
 <template>
   <div
-    class="tm-platform-item-container relative flex gap-2 p-0.5 hover:bg-orange-950"
+    class="tm-platform-item-container relative flex items-center gap-2 p-0.5 hover:bg-orange-950"
   >
-    <div class="bg-surface-900" style="width: 32px; height: 32px">
+    <div class="bg-surface-900" style="width: 56px; height: 56px">
       <img :src="'/data/items/' + items[item.item_id].icon + '_64.png'" />
     </div>
     <div class="w-8/12 overflow-hidden text-ellipsis" :title="item?.item_id">
       {{ items[item?.item_id].name }}
     </div>
-    <div class="ml-auto">{{ item?.rate }}/min</div>
+    <div class="ml-auto">
+      <span v-if="platform?.mode === 'load'">Provides </span>
+      <span v-else>Consumes </span>
+      <span>{{ item?.rate }}/min</span>
+    </div>
     <div
       class="tm-overlay absolute left-0 right-0 hidden text-right"
       :title="item?.item_id"
@@ -99,8 +103,6 @@ import { computed } from "vue";
 
 import { Button } from "primevue";
 
-import type { ItemDirection } from "@/api/types";
-
 import { useProjectStore } from "@/stores/useProjectStore";
 import { useSatisfactoryStore } from "@/stores/useSatisfactoryStore";
 
@@ -127,27 +129,15 @@ const platform = computed(() => {
 });
 
 const item = computed(() => {
-  if (props.itemDirection == "input") {
-    return platform.value?.inputs[props.itemIndex];
-  } else {
-    return platform.value?.outputs[props.itemIndex];
-  }
+  return platform.value?.items[props.itemIndex];
 });
 
 const onDeleteItem = () => {
-  if (props.itemDirection === "input") {
-    projectStore.removePlatformInput(
-      props.stationIndex,
-      props.platformIndex,
-      props.itemIndex,
-    );
-  } else if (props.itemDirection === "output") {
-    projectStore.removePlatformOutput(
-      props.stationIndex,
-      props.platformIndex,
-      props.itemIndex,
-    );
-  }
+  projectStore.removePlatformItem(
+    props.stationIndex,
+    props.platformIndex,
+    props.itemIndex,
+  );
 };
 </script>
 <style lang="css">

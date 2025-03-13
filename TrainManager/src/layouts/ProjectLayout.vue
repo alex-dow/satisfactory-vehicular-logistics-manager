@@ -1,10 +1,26 @@
 <template>
   <div class="flex w-full flex-grow flex-col">
-    <div class="m-1 rounded-sm bg-surface-900 p-1">
-      <h4 class="m-0 p-0 text-lg font-bold">
+    <div class="m-1 flex rounded-sm bg-surface-900 p-2">
+      <h4 class="m-0 p-0 text-4xl font-bold">
         {{ project?.project_name }}
       </h4>
-      <ProjectAutoSave :interval="5" />
+      <div class="ml-auto flex gap-2">
+        <Button
+          icon="pi pi-file-export"
+          label="Export Project"
+          severity="success"
+          outlined
+          @click="() => exportProject()"
+        />
+        <Button
+          icon="pi pi-trash"
+          severity="danger"
+          outlined
+          label="Delete Project"
+          @click="(e) => confirmDeleteProject(e)"
+        />
+        <ProjectAutoSave :interval="5" />
+      </div>
     </div>
 
     <Splitter class="w-full flex-grow">
@@ -96,7 +112,7 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { computed, onBeforeMount, onBeforeUnmount, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 
 import {
@@ -107,9 +123,10 @@ import {
   Checkbox,
 } from "primevue";
 
-import { useProject } from "@/api/useProjects";
+import { useDeleteProject, useProject } from "@/api/useProjects";
 import ProjectAutoSave from "@/components/ProjectAutoSave.vue";
 import AddTrainStationDialog from "@/modals/AddTrainStationDialog.vue";
+import router from "@/router";
 import { useProjectStore } from "@/stores/useProjectStore";
 const confirm = useConfirm();
 
@@ -123,6 +140,7 @@ const projectStore = useProjectStore();
 const { project, modified } = storeToRefs(projectStore);
 
 const { data, isLoading } = useProject(projectId.value);
+const deleteProject = useDeleteProject();
 
 watch(
   data,
@@ -135,6 +153,27 @@ watch(
   },
   { immediate: true },
 );
+
+const confirmDeleteProject = (event: MouseEvent) => {
+  confirm.require({
+    target: event.currentTarget || event.target,
+    message: "Are you sure you want to delete this project?",
+    icon: "pi pi-exclamation-triangle",
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Delete",
+      severity: "danger",
+    },
+    accept() {
+      deleteProject.mutate(projectId.value);
+      router.push({ name: "projects" });
+    },
+  });
+};
 
 const confirmDeleteTrainStation = (event: MouseEvent, stationIdx: number) => {
   confirm.require({
@@ -175,6 +214,14 @@ onBeforeRouteLeave((to, from) => {
     return false;
   }
 });
+
+const exportProject = () => {
+  const a = document.createElement("a");
+  const jsonStr = JSON.stringify(project.value, null, 4);
+  a.href = URL.createObjectURL(new Blob([jsonStr], { type: `text/plain` }));
+  a.download = project.value?.project_name + ".json";
+  a.click();
+};
 
 const selectedTrainStations = ref([]);
 </script>

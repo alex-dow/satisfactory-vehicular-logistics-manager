@@ -2,6 +2,7 @@
   <div class="m-0 flex items-center p-0 text-xs">
     <Button
       v-if="modified && !saveProject.isPending.value"
+      v-tooltip="'Click to save immediately'"
       class="w-20 !bg-orange-800 p-0"
       severity="warn"
       label="MODIFIED"
