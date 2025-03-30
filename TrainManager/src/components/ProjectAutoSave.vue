@@ -89,7 +89,7 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { computed, onBeforeMount, onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 import { Button } from "primevue";
 import { VeProgress } from "vue-ellipse-progress";

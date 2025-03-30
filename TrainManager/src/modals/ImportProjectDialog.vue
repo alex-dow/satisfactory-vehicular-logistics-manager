@@ -52,7 +52,7 @@ import {
 
 import type { TMProject } from "@/api/types";
 
-import { useCreateProject, useSaveProject } from "@/api/useProjects";
+import { useSaveProject } from "@/api/useProjects";
 
 const visible = defineModel<boolean>();
 const fileupload = ref();

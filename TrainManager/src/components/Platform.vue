@@ -207,10 +207,9 @@ import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 
 import { OhVueIcon } from "oh-vue-icons";
-import { Button, FloatLabel, IftaLabel, Select } from "primevue";
+import { Button, Select } from "primevue";
 
 import PlatformItem from "./PlatformItem.vue";
-import PlatformItemDirectionHeader from "./PlatformItemDirectionHeader.vue";
 
 import type { TMPlatform, TMPlatformMode, TMTrainStation } from "@/api/types";
 

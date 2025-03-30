@@ -29,15 +29,8 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 
-import {
-  FloatLabel,
-  IftaLabel,
-  Select,
-  type AutoCompleteCompleteEvent,
-} from "primevue";
+import { type AutoCompleteCompleteEvent } from "primevue";
 import { AutoComplete } from "primevue";
-
-import type { IItemSchema } from "@/satisfactory/schema/IItemSchema";
 
 import { type BasicItem } from "@/satisfactory/types";
 import { useSatisfactoryStore } from "@/stores/useSatisfactoryStore";

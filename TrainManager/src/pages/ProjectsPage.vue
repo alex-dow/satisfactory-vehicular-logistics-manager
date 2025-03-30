@@ -102,7 +102,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { Button, Column, DataTable, DataView, useConfirm } from "primevue";
+import { Button, DataView, useConfirm } from "primevue";
 
 import type { TMProject } from "@/api/types";
 

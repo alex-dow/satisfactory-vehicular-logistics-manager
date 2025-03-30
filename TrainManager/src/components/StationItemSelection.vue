@@ -49,21 +49,17 @@
 <script lang="ts" setup>
 import { shallowReactive } from "vue";
 
-import { Button, InputText, Select } from "primevue";
+import { Button, InputText } from "primevue";
 
 import SingleItemAutocomplete from "./SingleItemAutocomplete.vue";
-import SingleItemSelect from "./SingleItemSelect.vue";
 
 import type { PlatformTransfer } from "@/satisfactory/trainStations";
 import type { BasicItem } from "@/satisfactory/types";
-
-import { useSatisfactoryStore } from "@/stores/useSatisfactoryStore";
 
 const emit = defineEmits<{
   add: [v: PlatformTransfer];
   close: [];
 }>();
-const sfyStore = useSatisfactoryStore();
 
 const formData = shallowReactive<{
   item?: BasicItem;

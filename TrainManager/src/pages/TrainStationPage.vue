@@ -50,7 +50,6 @@ import { useRoute } from "vue-router";
 import { Button } from "primevue";
 
 import Platform from "@/components/Platform.vue";
-import TrainNetworkOverview from "@/components/TrainNetworkOverview.vue";
 import { useProjectStore } from "@/stores/useProjectStore";
 
 const route = useRoute();

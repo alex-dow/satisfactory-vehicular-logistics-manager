@@ -55,7 +55,7 @@ const projects = useProjects();
 const sessionStore = useSessionStore();
 const toast = useToast();
 
-const { currentUserId, currentUsername } = storeToRefs(sessionStore);
+const { currentUserId } = storeToRefs(sessionStore);
 
 const updatePassword = useUpdateUserPassword();
 

@@ -7,11 +7,11 @@
         data-component="platform-items-container"
       >
         <NetworkOverviewItem
-          @click="() => onSelectItem(itemId)"
           v-for="(rate, itemId) in outputItems"
           :key="itemId"
           :item-id="itemId"
           :rate="rate"
+          @click="() => onSelectItem(itemId)"
         />
       </div>
     </div>
@@ -53,18 +53,15 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
-import ItemIcon from "./ItemIcon.vue";
 import NetworkOverviewItem from "./NetworkOverviewItem.vue";
 
 import { type TMTrainStation } from "@/api/types";
-import { useProjectStore } from "@/stores/useProjectStore";
-import { useSatisfactoryStore } from "@/stores/useSatisfactoryStore";
 import StationsWithItem from "@/modals/StationsWithItem.vue";
+import { useProjectStore } from "@/stores/useProjectStore";
 
 const projectStore = useProjectStore();
-const sfyStore = useSatisfactoryStore();
 
 const { project } = storeToRefs(projectStore);
 

@@ -1,12 +1,7 @@
 import { defineStore } from "pinia";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
-import type {
-  TMPlatform,
-  TMPlatformItem,
-  TMPlatformMode,
-  TMProject,
-} from "@/api/types";
+import type { TMPlatformItem, TMPlatformMode, TMProject } from "@/api/types";
 
 export const useProjectStore = defineStore("current-project", () => {
   const modified = ref(false);
