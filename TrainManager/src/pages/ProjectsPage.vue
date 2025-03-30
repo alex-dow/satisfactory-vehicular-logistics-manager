@@ -8,6 +8,15 @@
     >
       Create a new project
     </Button>
+    <Button
+      v-if="selectedRows.length === 0"
+      class="ml-2 font-bold"
+      variant="outlined"
+      severity="info"
+      @click="showImportDialog = true"
+    >
+      Import a project
+    </Button>
     <Button v-else @click="() => onDeleteSelectedRows()">
       Delete Selected Projects
     </Button>
@@ -86,6 +95,7 @@
   </DataView>
 
   <AddProjectDialog v-model:visible="showAddDialog" />
+  <ImportProjectDialog v-model:visible="showImportDialog" />
 </template>
 
 <script lang="ts" setup>
@@ -98,8 +108,10 @@ import type { TMProject } from "@/api/types";
 
 import { useDeleteProject, useProjects } from "@/api/useProjects";
 import AddProjectDialog from "@/modals/AddProjectDialog.vue";
+import ImportProjectDialog from "@/modals/ImportProjectDialog.vue";
 
 const showAddDialog = ref(false);
+const showImportDialog = ref(false);
 
 const projects = useProjects();
 const router = useRouter();

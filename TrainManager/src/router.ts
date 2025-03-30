@@ -29,7 +29,7 @@ const routes = [
             name: "project",
           },
           {
-            path: "train-stations/:stationIndex",
+            path: "train-stations/:itemId",
             component: TrainStationPage,
             name: "train-station",
           },
@@ -39,14 +39,7 @@ const routes = [
   },
   {
     path: "/login",
-    component: LoginLayout,
-    children: [
-      {
-        path: "",
-        component: LoginPage,
-        name: "login",
-      },
-    ],
+    component: LoginPage,
   },
   {
     path: "/create-user",

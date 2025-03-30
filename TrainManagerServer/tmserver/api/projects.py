@@ -1,10 +1,13 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Path
 from fastapi.params import Depends
 from pydantic import BaseModel, Field
 
+from tmserver.data.droneStations import TMDroneStation
 from tmserver.data.projects import TMProject, get_projects, create_project, get_project, delete_project, save_project
+from tmserver.data.trainStations import TMTrainStation
+from tmserver.data.truckStations import TMTruckStation
 from tmserver.data.users import TMUser
 from tmserver.exc import InvalidProjectError
 from tmserver.security.tokens import get_current_user
@@ -16,11 +19,17 @@ def api_get_projects(user: Annotated[TMUser, Depends(get_current_user)]):
     return get_projects(user)
 
 class CreateProjectRequest(BaseModel):
-    projectName: str = Field(min_length=4)
+    project_name: str
+    train_stations: List[TMTrainStation]
+    truck_stations: List[TMTruckStation]
+    drone_stations: List[TMDroneStation]
 
 @router.post("/projects")
-def api_create_project(req: CreateProjectRequest, user: Annotated[TMUser, Depends(get_current_user)]):
-    project = create_project(project_name=req.projectName, owner_id=user.id)
+def api_create_project(project: TMProject, user: Annotated[TMUser, Depends(get_current_user)]):
+    if user.id == None:
+        raise InvalidProjectError("There is no user id to assign ownership to the project?")
+    
+    project = create_project(project=project, owner_id=user.id)
     return project
 
 @router.get("/projects/{project_id}")

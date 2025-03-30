@@ -9,6 +9,7 @@
           v-model="formData.rate"
           size="small"
           :min="0"
+          :max-fraction-digits="5"
         />
         <label for="input-rate">Rate per minute</label>
       </IftaLabel>

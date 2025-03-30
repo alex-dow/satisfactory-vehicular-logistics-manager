@@ -5,9 +5,9 @@
     header="Create a New Project"
     @show="formData.projectName = ''"
   >
-    <Message v-if="createProject.isError.value" severity="error" class="mb-2">
+    <Message v-if="saveProject.isError.value" severity="error" class="mb-2">
       <div class="flex items-center gap-2">
-        <i class="pi pi-times-circle" />{{ createProject.error }}
+        <i class="pi pi-times-circle" />{{ saveProject.error }}
       </div>
     </Message>
 
@@ -42,11 +42,11 @@ import { useRouter } from "vue-router";
 
 import { Dialog, InputText, Button, Message } from "primevue";
 
-import { useCreateProject } from "@/api/useProjects";
+import { useSaveProject } from "@/api/useProjects";
 
 const visible = defineModel<boolean>();
 
-const createProject = useCreateProject();
+const saveProject = useSaveProject();
 
 const formData = reactive<{
   projectName?: string;
@@ -55,7 +55,12 @@ const formData = reactive<{
 const router = useRouter();
 
 const onSubmit = async () => {
-  const newProject = await createProject.mutateAsync(formData.projectName!);
+  const newProject = await saveProject.mutateAsync({
+    project_name: formData.projectName!,
+    train_stations: [],
+    truck_stations: [],
+    drone_stations: [],
+  });
   router.push({ name: "project", params: { projectId: newProject.id } });
 };
 </script>

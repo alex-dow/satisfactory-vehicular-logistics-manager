@@ -14,7 +14,7 @@ from tmserver.exc import InvalidProjectError
 
 class TMProject(BaseModel):
     id: int | None = None
-    owner_id: int
+    owner_id: int | None = None
     project_name: str
     train_stations: List[TMTrainStation]
     truck_stations: List[TMTruckStation]
@@ -91,41 +91,39 @@ def save_project(project: TMProject) -> TMProject:
         truck_station_json = json.dumps(project.truck_stations, default=pydantic_encoder)
         drone_station_json = json.dumps(project.drone_stations, default=pydantic_encoder)
         
-        entry = session.get(ProjectEntry, project.id)
-        if entry == None:
-            raise InvalidProjectError("Project #%i does not exist", project.id)
-        
-        entry.project_name = project.project_name
-        entry.train_stations = train_station_json
-        entry.truck_stations = truck_station_json
-        entry.drone_stations = drone_station_json
+        if project.id:
+            entry = session.get(ProjectEntry, project.id)
+            if entry == None:
+                raise InvalidProjectError("Project #%i does not exist", project.id)
+        else:
+            entry = ProjectEntry(
+                owner_id=project.owner_id, # type: ignore
+                project_name=project.project_name,
+                drone_stations=drone_station_json,
+                train_stations=train_station_json,
+                truck_stations=truck_station_json
+            )
 
-        
         session.add(entry)
         session.commit()
         session.refresh(entry)
 
-        return get_project(project.id) # type: ignore
+        return get_project(entry.id) # type: ignore
 
 
 
-def create_project(project_name: str, owner_id: int) -> TMProject:
+def create_project(project: TMProject, owner_id: int) -> TMProject:
 
-    with Session() as session:
+    newProject: TMProject = TMProject(
+        id=None,
+        owner_id=owner_id,
+        project_name=project.project_name,
+        drone_stations=project.drone_stations,
+        truck_stations=project.truck_stations,
+        train_stations=project.train_stations
+    )
 
-        project_entry = ProjectEntry(
-            owner_id=owner_id,
-            project_name=project_name,
-            train_stations='[]',
-            truck_stations='[]',
-            drone_stations='[]'
-        )
-
-        session.add(project_entry)
-        session.commit()
-        session.refresh(project_entry)
-
-        return get_project(project_entry.id) # type: ignore
+    return save_project(newProject)
 
 
 def delete_project(project_id: int):

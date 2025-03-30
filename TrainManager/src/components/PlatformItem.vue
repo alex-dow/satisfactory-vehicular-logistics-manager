@@ -9,14 +9,7 @@
       <div class="overflow-hidden text-ellipsis">
         {{ items[item?.item_id].name }}
       </div>
-      <div>
-        {{
-          (platform.mode === "load" ? "Loading " : "Unloading") +
-          " " +
-          item?.rate +
-          "/min"
-        }}
-      </div>
+      <div>Rate: {{ item?.rate }}/min</div>
     </div>
     <div
       class="tm-overlay absolute left-0 right-0 hidden text-right"

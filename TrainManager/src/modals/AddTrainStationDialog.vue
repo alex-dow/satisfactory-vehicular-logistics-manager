@@ -59,7 +59,7 @@ const onSubmit = async () => {
     name: "train-station",
     params: {
       projectId: projectStore.project?.id,
-      stationIndex: projectStore.project?.train_stations.length - 1,
+      itemId: projectStore.project?.train_stations.length - 1,
     },
   });
 

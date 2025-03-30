@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-1">
+  <div class="flex w-full flex-col gap-1">
     <div class="flex items-center gap-2 bg-surface-800 p-0.5">
       <div>
         <OhVueIcon :name="iconName" scale="1.5" />

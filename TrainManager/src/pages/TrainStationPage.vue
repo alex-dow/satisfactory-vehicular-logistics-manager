@@ -25,7 +25,7 @@
     <hr />
 
     <div class="flex gap-2">
-      <div class="flex w-5/12 flex-col gap-4">
+      <div class="flex w-full flex-col gap-4">
         <Platform
           v-for="(platform, idx) in trainStation.platforms"
           :key="'platform-' + stationIndex + '-' + idx"
@@ -34,10 +34,11 @@
         />
       </div>
 
+      <!--
       <div class="w-7/12">
         <TrainNetworkOverview />
       </div>
-    </div>
+    --></div>
   </div>
 </template>
 
@@ -55,7 +56,7 @@ import { useProjectStore } from "@/stores/useProjectStore";
 const route = useRoute();
 
 const stationIndex = computed(() => {
-  return parseInt(route.params.stationIndex as string);
+  return parseInt(route.params.itemId as string);
 });
 
 const projectStore = useProjectStore();

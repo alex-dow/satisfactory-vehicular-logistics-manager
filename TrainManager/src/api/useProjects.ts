@@ -40,18 +40,32 @@ export const useSaveProject = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (project: TMProject): Promise<TMProject> => {
-      const res = await clientFetch(
-        "/api/projects/" + encodeURIComponent(project.id),
-        {
-          method: "put",
+      let res: Response;
+      if (project.id) {
+        res = await clientFetch(
+          "/api/projects/" + encodeURIComponent(project.id),
+          {
+            method: "put",
+            body: JSON.stringify(project),
+            headers: {
+              "content-type": "application/json",
+            },
+          },
+        );
+        if (res.status >= 400) {
+          throw new Error("Failed to create project");
+        }
+      } else {
+        res = await clientFetch("/api/projects", {
+          method: "post",
           body: JSON.stringify(project),
           headers: {
             "content-type": "application/json",
           },
-        },
-      );
-      if (res.status >= 400) {
-        throw new Error("Failed to create project");
+        });
+        if (res.status >= 400) {
+          throw new Error("Failed to create project");
+        }
       }
       const updatedProject = await res.json();
       return updatedProject;
@@ -68,7 +82,7 @@ export const useCreateProject = () => {
     mutationFn: async (projectName: string): Promise<TMProject> => {
       const res = await clientFetch("/api/projects", {
         method: "post",
-        body: JSON.stringify({ projectName }),
+        body: JSON.stringify({ project_name: projectName }),
         headers: {
           "content-type": "application/json",
         },

@@ -1,52 +1,66 @@
 <template>
-  <form class="w-full space-y-8" @submit.prevent="onSubmit">
-    <ProgressSpinner v-if="state.isPending" class="text-center" />
-    <template v-else>
-      <h3 class="text-center text-2xl font-bold">
-        To use this tool, you will need to create an account. No email address
-        is required.
-      </h3>
-      <Message v-if="state.isError" severity="error">
-        Invalid username or password.
-      </Message>
-      <FloatLabel>
-        <InputText
-          id=" username"
-          v-model="formData.username"
-          class="w-full"
-          :disabled="state.isPending"
-        />
-        <label for="username">Username</label>
-      </FloatLabel>
-      <FloatLabel>
-        <Password
-          id="password"
-          v-model="formData.password"
-          toggle-mask
-          :feedback="false"
-          :disabled="state.isPending"
-          fluid
-          :pt="{
-            pcInputText: {
-              root: {
-                class: 'w-full',
-              },
-            },
-          }"
-        />
-        <label for="password">Password</label>
-      </FloatLabel>
-      <p>
-        To use this tool, you'll need to
-        <router-link to="/create-user">create an account</router-link>. No email
-        address required.
-      </p>
-      <div class="flex justify-center gap-2 text-center">
-        <Button variant="outlined"> Create account</Button>
-        <Button type="submit"> Login </Button>
-      </div>
-    </template>
-  </form>
+  <div class="flex w-full justify-center">
+    <div class="flex flex-col sm:w-full lg:w-1/2">
+      <h1
+        class="w-full bg-slate-800 p-4 text-center font-bold sm:text-2xl md:text-3xl lg:text-4xl"
+      >
+        Satisfactory Vehicular Logistics Management
+      </h1>
+      <ProgressSpinner v-if="state.isPending" class="text-center" />
+      <template v-else>
+        <p class="mt-4 text-center">
+          This is an online tool to help manage your train, truck, and
+          eventually, drone logistics. Setup your stations with what items they
+          load and unload, view reports on what is available on your vehicular
+          logistics networks, identify deficits, etc.
+        </p>
+        <p class="mb-5 mt-4 text-center">
+          To start using the tool, first login or
+          <router-link to="/create-user">create an account</router-link> with
+          just a username and password. No email address required.
+        </p>
+        <Message v-if="state.isError" severity="error">
+          Invalid username or password.
+        </Message>
+        <form class="space-y-6 self-center lg:w-1/2" @submit.prevent="onSubmit">
+          <FloatLabel>
+            <InputText
+              id=" username"
+              v-model="formData.username"
+              class="w-full"
+              :disabled="state.isPending"
+            />
+            <label for="username">Username</label>
+          </FloatLabel>
+          <FloatLabel>
+            <Password
+              id="password"
+              v-model="formData.password"
+              toggle-mask
+              :feedback="false"
+              :disabled="state.isPending"
+              fluid
+              :pt="{
+                pcInputText: {
+                  root: {
+                    class: 'w-full',
+                  },
+                },
+              }"
+            />
+            <label for="password">Password</label>
+          </FloatLabel>
+
+          <div class="flex justify-center gap-2 text-center">
+            <Button variant="outlined" @click="() => onCreateAccount()">
+              Create account</Button
+            >
+            <Button type="submit"> Login </Button>
+          </div>
+        </form>
+      </template>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -82,6 +96,10 @@ const state = reactive({
   isSuccess: false,
   isIdle: true,
 });
+
+const onCreateAccount = () => {
+  router.push({ name: "create-user" });
+};
 
 const onSubmit = async () => {
   state.isPending = true;
