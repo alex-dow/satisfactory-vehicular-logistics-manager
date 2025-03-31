@@ -24,7 +24,7 @@ class LoginResponse(BaseModel):
     type: str
 
 
-@router.post("/refresh")
+@router.post("/api/refresh")
 def refresh(refreshToken: Annotated[str, Depends(refresh_cookie)], response: Response, settings: Annotated[Settings, Depends(get_settings)]) -> LoginResponse:
     logger = logging.getLogger(__name__)
     if is_token_expired(refreshToken, settings.jwt_refresh_secret):
@@ -43,7 +43,7 @@ def refresh(refreshToken: Annotated[str, Depends(refresh_cookie)], response: Res
     return res
 
 
-@router.post("/login")
+@router.post("/api/login")
 def login(req: LoginRequest, response: Response, settings: Annotated[Settings, Depends(get_settings)]) -> LoginResponse:
     logger = logging.getLogger(__name__)
     try:
@@ -80,7 +80,7 @@ def login(req: LoginRequest, response: Response, settings: Annotated[Settings, D
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
 
-@router.post("/logout")
+@router.post("/api/logout")
 def logout(response: Response):
     response.set_cookie(
         key="session",
@@ -98,7 +98,7 @@ def logout(response: Response):
     )
 
 
-@router.get("/whoami")
+@router.get("/api/whoami")
 def whoami(user: Annotated[TMUser, Depends(get_current_user)]) -> TMUser:
     usercopy = user.model_copy(update={"password": ""}, deep=True)
     print("user copy password? %s" % usercopy)

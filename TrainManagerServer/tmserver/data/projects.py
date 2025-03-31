@@ -95,6 +95,9 @@ def save_project(project: TMProject) -> TMProject:
             entry = session.get(ProjectEntry, project.id)
             if entry == None:
                 raise InvalidProjectError("Project #%i does not exist", project.id)
+            entry.train_stations = train_station_json
+            entry.truck_stations = truck_station_json
+            entry.drone_stations = drone_station_json
         else:
             entry = ProjectEntry(
                 owner_id=project.owner_id, # type: ignore

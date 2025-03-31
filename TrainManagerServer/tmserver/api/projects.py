@@ -14,7 +14,7 @@ from tmserver.security.tokens import get_current_user
 
 router = APIRouter()
 
-@router.get("/projects")
+@router.get("/api/projects")
 def api_get_projects(user: Annotated[TMUser, Depends(get_current_user)]):
     return get_projects(user)
 
@@ -24,7 +24,7 @@ class CreateProjectRequest(BaseModel):
     truck_stations: List[TMTruckStation]
     drone_stations: List[TMDroneStation]
 
-@router.post("/projects")
+@router.post("/api/projects")
 def api_create_project(project: TMProject, user: Annotated[TMUser, Depends(get_current_user)]):
     if user.id == None:
         raise InvalidProjectError("There is no user id to assign ownership to the project?")
@@ -32,7 +32,7 @@ def api_create_project(project: TMProject, user: Annotated[TMUser, Depends(get_c
     project = create_project(project=project, owner_id=user.id)
     return project
 
-@router.get("/projects/{project_id}")
+@router.get("/api/projects/{project_id}")
 def api_get_project(project_id: int, user: Annotated[TMUser, Depends(get_current_user)]):
     project = get_project(project_id)
     if project.owner_id != user.id:
@@ -40,7 +40,7 @@ def api_get_project(project_id: int, user: Annotated[TMUser, Depends(get_current
     return project
     
 
-@router.put("/projects/{project_id}")
+@router.put("/api/projects/{project_id}")
 def api_save_project(project: TMProject, 
                      project_id: Annotated[int, Path(title="Project ID")],
                      user: Annotated[TMUser, Depends(get_current_user)]):
@@ -54,7 +54,7 @@ def api_save_project(project: TMProject,
     return newProject
 
 
-@router.delete("/projects/{project_id}")
+@router.delete("/api/projects/{project_id}")
 def api_delete_project(project_id: int, user: Annotated[TMUser, Depends(get_current_user)]):
     project = get_project(project_id)
     if project.owner_id != user.id:

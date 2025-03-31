@@ -18,7 +18,7 @@ class CreateUserRequest(BaseModel):
 class UpdatePasswordRequest(BaseModel):
     password: str = Field(min_length=4)
 
-@router.post("/users")
+@router.post("/api/users")
 def api_create_user(req: CreateUserRequest) -> TMUser:
     try:
         user = create_user(req.username, req.password)
@@ -26,10 +26,10 @@ def api_create_user(req: CreateUserRequest) -> TMUser:
     except sqlalchemy.exc.IntegrityError:
         raise HTTPException(status_code=409, detail="Username already exists")
 
-
+"""
 @router.get("/users")
 def api_get_all_users(currentUser: Annotated[TMUser, Depends(get_current_user)]):
-    if currentUser.id is not None and currentUser.id > 1:
+    if currentUser is None or currentUser.id is None or currentUser.id > 1:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     users = list(map(filter_user_password, get_users()))
@@ -39,16 +39,16 @@ def api_get_all_users(currentUser: Annotated[TMUser, Depends(get_current_user)])
 
 @router.delete("/users/{user_id}")
 def api_delete_user(user_id: int, currentUser: Annotated[TMUser, Depends(get_current_user)]):
-    if currentUser.id is not None and currentUser.id > 1:
+    if currentUser is None or currentUser.id is None or currentUser.id > 1:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     if user_id == 1:
         raise HTTPException(status_code=409, detail="Can't delete this user")
 
     delete_user(user_id=user_id)
+"""
 
-
-@router.put("/users/{user_id}/password")
+@router.put("/api/users/{user_id}/password")
 def api_update_user_password(user_id: int, req: UpdatePasswordRequest, currentUser: Annotated[TMUser, Depends(get_current_user)]):
 
     user = get_user(user_id=user_id)
