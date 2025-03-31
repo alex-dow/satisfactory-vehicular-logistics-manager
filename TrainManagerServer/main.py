@@ -38,10 +38,12 @@ app.include_router(projects_router)
 app.include_router(session_router)
 app.include_router(users_router)
 
+app.mount("/assets", StaticFiles(directory="../TrainManager/dist/assets"))
+app.mount("/data", StaticFiles(directory="../TrainManager/dist/data"))
+
 @app.get("/{full_path:path}")
 async def serve_client():
     with open("../TrainManager/dist/index.html") as fh:
         data = fh.read()
     return Response(content=data, media_type="text/html")
 
-app.mount("/", StaticFiles(directory="../TrainManager/dist"))
