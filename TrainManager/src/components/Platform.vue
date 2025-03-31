@@ -88,119 +88,22 @@
         :platform-index="props.platformIndex"
         :station-index="props.stationIndex"
         :item-index="idx"
-        item-direction="input"
+        @edit-item="onEditItem($event)"
       />
     </div>
 
-    <AddPlatformItem
+    <ItemAndRateDialog
       v-model="showAddItemDialog"
-      :station-index="props.stationIndex"
-      :platform-index="props.platformIndex"
+      header="Add Item"
+      network="train"
+      :station-idx="props.stationIndex"
+      :platform-idx="props.platformIndex"
+      :item-id="editingItem?.item_id"
+      :rate="editingItem?.rate"
+      @submit="onSaveItem"
     />
   </div>
-  <!--
-  <div class="m-2 flex gap-2 p-2">
-    <div class="w-1/8 p-202 flex flex-col bg-surface-800">
-      <div class="flex items-center justify-center gap-2">
-        <OhVueIcon
-          v-if="platform.mode == 'load'"
-          name="hi-download"
-          scale="1.5"
-          title="Load"
-        />
-        <OhVueIcon v-else name="hi-upload" scale="1.5" title="Unload" />
-        <div
-          class="text-center text-3xl font-extrabold text-orange-200 drop-shadow-lg"
-        >
-          {{ platformNumber }}
-        </div>
-      </div>
-      <div class="mt-4 flex w-full">
-        <FloatLabel class="w-full">
-          <Select
-            :id="'platform-direction-' + platformNumber"
-            :model-value="platform.mode"
-            :options="['load', 'unload']"
-            fluid
-            variant="filled"
-            size="small"
-            @update:model-value="onChangePlatformDirection"
-          />
-          <label :for="'platform-direction-' + platformNumber"
-            >Platform Mode</label
-          >
-        </FloatLabel>
-      </div>
-      <div class="mt-2 flex justify-center gap-2">
-        <Button
-          v-tooltip="{ value: 'Delete platform', showDelay: 500 }"
-          icon="pi pi-trash"
-          severity="danger"
-          aria-label="Delete item"
-          zlabel="Delete"
-          variant="outlined"
-          size="small"
-          class="w-7 p-0"
-          @click="() => onDeletePlatform()"
-        />
-        <Button
-          v-tooltip="{ value: 'Move Up', showDelay: 500 }"
-          icon="pi pi-arrow-up"
-          severity="info"
-          aria-label="Move Up"
-          variant="outlined"
-          size="small"
-          class="w-7 p-0"
-          @click="
-            () =>
-              projectStore.movePlatformUp(
-                props.stationIndex,
-                props.platformIndex,
-              )
-          "
-        />
-        <Button
-          v-tooltip="{ value: 'Move Down', showDelay: 500 }"
-          icon="pi pi-arrow-down"
-          severity="info"
-          aria-label="Move Up"
-          variant="outlined"
-          size="small"
-          class="w-7 p-0"
-          @click="
-            () =>
-              projectStore.movePlatformDown(
-                props.stationIndex,
-                props.platformIndex,
-              )
-          "
-        />
-      </div>
-    </div>
-    <div class="flex flex-grow flex-col gap-1 bg-surface-800 p-2">
-      <PlatformItemDirectionHeader
-        direction="input"
-        @add-item="() => onAddItem('input')"
-      >
-        ITEMS
-      </PlatformItemDirectionHeader>
-      <PlatformItem
-        v-for="(item, idx) in platform?.items"
-        :key="item.item_id"
-        :platform-index="props.platformIndex"
-        :station-index="props.stationIndex"
-        :item-index="idx"
-        item-direction="input"
-      />
-    </div>
-
-    <AddPlatformItem
-      v-model="showAddItemDialog"
-      :station-index="props.stationIndex"
-      :platform-index="props.platformIndex"
-    />
-  </div>
---></template>
+</template>
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
@@ -211,9 +114,15 @@ import { Button, Select } from "primevue";
 
 import PlatformItem from "./PlatformItem.vue";
 
-import type { TMPlatform, TMPlatformMode, TMTrainStation } from "@/api/types";
+import type {
+  TMPlatform,
+  TMPlatformItem,
+  TMPlatformMode,
+  TMTrainStation,
+} from "@/api/types";
 
-import AddPlatformItem from "@/modals/AddPlatformItem.vue";
+import AddPlatformItemDialog from "@/modals/AddPlatformItem.vue";
+import ItemAndRateDialog from "@/modals/ItemAndRateDialog.vue";
 import { useProjectStore } from "@/stores/useProjectStore";
 
 const props = defineProps<{
@@ -225,6 +134,34 @@ const showAddItemDialog = ref(false);
 
 const onAddItem = () => {
   showAddItemDialog.value = true;
+};
+
+const editingItem = ref<TMPlatformItem | null>(null);
+const editingItemIndex = ref<number | null>(null);
+
+const onEditItem = (itemIdx: number) => {
+  const platformItem = platform.value.items[itemIdx];
+  if (platformItem) {
+    editingItem.value = platformItem;
+    editingItemIndex.value = itemIdx;
+    showAddItemDialog.value = true;
+  }
+};
+
+const onSaveItem = (item: TMPlatformItem) => {
+  if (editingItemIndex.value != null) {
+    projectStore.updatePlatformItem(
+      props.stationIndex,
+      props.platformIndex,
+      editingItemIndex.value,
+      item,
+    );
+
+    editingItem.value = null;
+    editingItemIndex.value = null;
+  } else {
+    projectStore.addPlatformItem(props.stationIndex, props.platformIndex, item);
+  }
 };
 
 const projectStore = useProjectStore();

@@ -1,31 +1,31 @@
 <template>
-  <div v-if="trainStation" class="p-2">
-    <div class="flex items-center gap-4 p-2">
+  <div v-if="trainStation">
+    <div
+      class="flex flex-wrap items-center gap-4 border-b-2 border-orange-800 p-2 sm:flex-col md:flex-row lg:flex-row"
+    >
       <img
         src="/data/items/desc-trainstation-c_64.png"
-        class="rounded-lg"
-        style="width: 48px; height: 48px"
+        class="rounded-lg sm:hidden md:block lg:block"
+        style="width: 32px; height: 32px"
       />
-      <h1 class="m-0 text-4xl font-bold">
+      <h1 class="m-0 text-2xl font-bold">
         {{ trainStation.station_name }}
       </h1>
       <Button
         icon="pi pi-plus"
         variant="outlined"
-        xseverity="success"
         raised
         rounded
-        size="large"
-        aria-label="Remove platform"
-        label="Add platform to station"
-        class="ml-auto"
+        size="small"
+        aria-label="Add platform"
+        label="Add platform"
+        class="sm:ml-0 md:ml-auto lg:ml-auto"
         @click="addPlatform"
       />
     </div>
-    <hr />
 
     <div class="flex gap-2">
-      <div class="flex w-full flex-col gap-4">
+      <div class="flex w-full flex-col gap-4 p-1">
         <Platform
           v-for="(platform, idx) in trainStation.platforms"
           :key="'platform-' + stationIndex + '-' + idx"

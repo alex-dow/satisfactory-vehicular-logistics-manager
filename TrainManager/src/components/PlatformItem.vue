@@ -12,11 +12,20 @@
       <div>Rate: {{ item?.rate }}/min</div>
     </div>
     <div
-      class="tm-overlay absolute left-0 right-0 hidden text-right"
+      class="tm-overlay absolute left-0 right-0 hidden pr-2 text-right"
       :title="item?.item_id"
     >
       <Button
-        v-tooltip="{ value: 'Delete this item', showDelay: 500 }"
+        v-tooltip="{ value: 'Edit', showDelay: 500 }"
+        icon="pi pi-pencil"
+        severity="info"
+        aria-label="Edit item"
+        size="small"
+        class="mr-2 w-7 pb-0.5 pl-0 pr-0 pt-0.5 text-xs"
+        @click="() => emit('editItem', props.itemIndex)"
+      />
+      <Button
+        v-tooltip="{ value: 'Delete', showDelay: 500 }"
         icon="pi pi-trash"
         severity="danger"
         aria-label="Delete item"
@@ -26,74 +35,6 @@
       />
     </div>
   </div>
-  <!--
-    <Select
-      v-model="formData.itemDirection"
-      size="small"
-      :options="['input', 'output']"
-      class="min-w-36"
-      variant="outlined"
-    >
-      <template #value="slotProps">
-        <div
-          class="flex items-center gap-2 text-lg leading-none"
-          :style="{ 'font-variant': 'small-caps' }"
-        >
-          <OhVueIcon
-            v-if="slotProps.value === 'input'"
-            name="md-input-twotone"
-            scale="0.75"
-          />
-          <OhVueIcon
-            v-else-if="slotProps.value === 'output'"
-            name="md-input-twotone"
-            scale="0.75"
-          />
-          <p class="m-0 p-0">
-            {{ slotProps.value }}
-          </p>
-        </div>
-      </template>
-
-      <template #option="slotProps">
-        <div
-          class="flex items-center gap-2 text-lg leading-none"
-          :style="{ 'font-variant': 'small-caps' }"
-        >
-          <OhVueIcon
-            v-if="slotProps.option === 'input'"
-            name="md-input-twotone"
-            scale="1"
-          />
-          <OhVueIcon
-            v-else-if="slotProps.option === 'output'"
-            name="md-input-twotone"
-            scale="1"
-          />
-          {{ slotProps.option }}
-        </div>
-      </template>
-    </Select>
-
-    <SingleItemAutocomplete
-      :id="'platform-' + props.platformIndex + '-item'"
-      v-model="formData.item"
-    />
-    <InputNumber
-      v-model="formData.rate"
-      type="number"
-      size="small"
-      variant="filled"
-      :pt="{
-        pcInputText: {
-          root: {
-            class: 'w-24',
-          },
-        },
-      }"
-      :min="0"
-    />
-  -->
 </template>
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
@@ -108,7 +49,10 @@ const props = defineProps<{
   stationIndex: number;
   platformIndex: number;
   itemIndex: number;
-  itemDirection: ItemDirection;
+}>();
+
+const emit = defineEmits<{
+  editItem: [itemIdx: number];
 }>();
 
 const projectStore = useProjectStore();

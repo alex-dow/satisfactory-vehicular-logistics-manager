@@ -1,6 +1,6 @@
 <template>
-  <p v-if="isLoading">......</p>
-  <div v-if="project" class="mt-3 flex justify-center gap-4 p-2">
+  <div class="mt-3 flex justify-center gap-4 p-2">
+    <!--
     <Card class="w-1/3 hover:bg-gray-100">
       <template #header>
         <div class="flex w-full justify-center">
@@ -20,13 +20,13 @@
       </template>
       <template #title>Train Logistics</template>
       <template #content>
-        <p v-if="project.train_stations.length == 0" class="m-0">
+        <p v-if="project?.train_stations.length == 0" class="m-0">
           You have no train stations added to this project. Click here to get
           started.
         </p>
         <p v-else class="m-0">
           You have
-          <strong>{{ project.train_stations.length }}</strong> stations. Click
+          <strong>{{ project?.train_stations.length }}</strong> stations. Click
           here to manage your train network.
         </p>
       </template>
@@ -39,10 +39,10 @@
       </template>
       <template #title>Drone Logistics</template>
       <template #content>
-        <p class="m-0">UNAVAILABLE</p>
+        <p class="m-0">Coming soon ...</p>
       </template>
     </Card>
-  </div>
+  --></div>
 </template>
 
 <script lang="ts" setup>

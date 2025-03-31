@@ -1,5 +1,11 @@
 <template>
-  <div class="flex w-full flex-grow flex-col">
+  <div
+    v-if="isLoading"
+    class="flex w-full flex-grow flex-col items-center justify-center"
+  >
+    <Spinner />
+  </div>
+  <div v-else class="flex w-full flex-grow flex-col">
     <div class="m-1 flex rounded-sm bg-surface-900 p-2">
       <h4 class="m-0 p-0 text-4xl font-bold">
         {{ project?.project_name }}
@@ -24,7 +30,7 @@
     </div>
 
     <Splitter class="w-full flex-grow">
-      <SplitterPanel :size="25">
+      <SplitterPanel :size="33">
         <Accordion value="0">
           <LeftColumnAccordionPanel
             delete-message="Are you sure you want to delete this train station?"
@@ -195,11 +201,11 @@
         </div>
       -->
       </SplitterPanel>
-      <SplitterPanel :size="75">
+      <SplitterPanel :size="33">
         <router-view />
       </SplitterPanel>
-      <SplitterPanel>
-        <TrainNetworkOverview />
+      <SplitterPanel :size="33">
+        <NetworkOverviewList />
       </SplitterPanel>
     </Splitter>
 
@@ -226,7 +232,9 @@ import {
 } from "primevue";
 
 import { useDeleteProject, useProject } from "@/api/useProjects";
+import NetworkOverviewList from "@/components/NetworkOverviewList.vue";
 import ProjectAutoSave from "@/components/ProjectAutoSave.vue";
+import Spinner from "@/components/Spinner.vue";
 import TrainNetworkOverview from "@/components/TrainNetworkOverview.vue";
 import LeftColumnAccordionPanel from "@/components/projectLayout/LeftColumnAccordionPanel.vue";
 import AddTrainStationDialog from "@/modals/AddTrainStationDialog.vue";
@@ -291,6 +299,13 @@ const trainStations = computed(() => {
 const deleteTrainStation = async (stationIdx: number) => {
   projectStore.removeTrainStation(stationIdx);
 };
+
+/**
+ * Adjust the layout if we are directly on a project page
+ */
+const isProjectPage = computed(() => {
+  return route.name === "project";
+});
 
 onBeforeRouteLeave(() => {
   if (modified.value === true) {

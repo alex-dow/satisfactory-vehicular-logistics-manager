@@ -1,64 +1,14 @@
 <template>
-  <div class="flex flex-grow gap-2">
-    <div class="w-1/3">
-      <h1 class="text-lg">Outputs</h1>
-      <div
-        class="flex flex-col gap-1"
-        data-component="platform-items-container"
-      >
-        <NetworkOverviewItem
-          v-for="(rate, itemId) in outputItems"
-          :key="itemId"
-          :item-id="itemId"
-          :rate="rate"
-          @click="() => onSelectItem(itemId)"
-        />
-      </div>
-    </div>
-
-    <div class="w-1/3">
-      <h1 class="text-lg">Inputs</h1>
-      <div
-        class="flex flex-col gap-1"
-        data-component="platform-items-container"
-      >
-        <NetworkOverviewItem
-          v-for="(rate, itemId) in inputItems"
-          :key="itemId"
-          :item-id="itemId"
-          :rate="rate"
-        />
-      </div>
-    </div>
-    <div class="w-1/3">
-      <h1 class="text-lg">Availablity</h1>
-      <div
-        class="flex flex-col gap-1"
-        data-component="platform-items-container"
-      >
-        <NetworkOverviewItem
-          v-for="(rate, itemId) in availableItems"
-          :key="itemId"
-          :item-id="itemId"
-          :rate="rate"
-        />
-      </div>
-    </div>
-    <StationsWithItem
-      v-model="showStationsWithItem"
-      :item-id="selectedItemId"
-    />
-  </div>
+  <NetworkOverviewList />
 </template>
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { computed, ref, watchEffect } from "vue";
 
-import NetworkOverviewItem from "./NetworkOverviewItem.vue";
+import NetworkOverviewList from "./NetworkOverviewList.vue";
 
 import { type TMTrainStation } from "@/api/types";
-import StationsWithItem from "@/modals/StationsWithItem.vue";
 import { useProjectStore } from "@/stores/useProjectStore";
 
 const projectStore = useProjectStore();
@@ -72,14 +22,6 @@ const trainStations = computed<TMTrainStation[]>(() => {
 const inputItems = ref<Record<string, number>>({});
 const availableItems = ref<Record<string, number>>({});
 const outputItems = ref<Record<string, number>>({});
-
-const showStationsWithItem = ref(false);
-const selectedItemId = ref<string | null>(null);
-
-const onSelectItem = (itemId: string) => {
-  selectedItemId.value = itemId;
-  showStationsWithItem.value = true;
-};
 
 watchEffect(() => {
   const iItems: Record<string, number> = {};

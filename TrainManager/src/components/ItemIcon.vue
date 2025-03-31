@@ -1,5 +1,8 @@
 <template>
-  <img :src="'/data/items/' + icon + '_' + props.size + '.png'" />
+  <img
+    :src="'/data/items/' + icon + '_' + props.size + '.png'"
+    :title="sfyStore.itemNames[props.itemId]"
+  />
 </template>
 
 <script lang="ts" setup>

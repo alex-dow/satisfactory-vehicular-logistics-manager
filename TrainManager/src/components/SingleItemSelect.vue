@@ -41,9 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
-
-import { Select, type AutoCompleteCompleteEvent } from "primevue";
+import { Select } from "primevue";
 
 import { type BasicItem } from "@/satisfactory/types";
 import { useSatisfactoryStore } from "@/stores/useSatisfactoryStore";
@@ -51,18 +49,6 @@ import { useSatisfactoryStore } from "@/stores/useSatisfactoryStore";
 const sfyStore = useSatisfactoryStore();
 
 const value = defineModel<BasicItem>();
-
-const suggestions = ref<BasicItem[]>([]);
-
-const search = (evt: AutoCompleteCompleteEvent) => {
-  if (!evt.query) {
-    suggestions.value = sfyStore.basicItems;
-  } else {
-    suggestions.value = sfyStore.basicItems.filter(
-      (item) => item.name.toLowerCase().indexOf(evt.query.toLowerCase()) > -1,
-    );
-  }
-};
 
 const props = defineProps<{
   id: string;

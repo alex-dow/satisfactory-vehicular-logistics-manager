@@ -1,8 +1,12 @@
 <template>
   <Dialog v-model:visible="visible" modal header="Stations" :min-x="400">
-    <p>Stations with {{ itemName }}</p>
-    <div v-for="trainStation in stations" :key="trainStation.station_name">
+    <p>Train Stations with {{ itemName }}</p>
+    <div v-for="trainStation in trainStations" :key="trainStation.station_name">
       {{ trainStation.station_name }}
+    </div>
+    <p>Truck Stations with {{ itemName }}</p>
+    <div v-for="truckStation in truckStations" :key="truckStation.station_name">
+      {{ truckStation.station_name }}
     </div>
   </Dialog>
 </template>
@@ -27,7 +31,6 @@ const { project } = storeToRefs(projectStore);
 
 const props = defineProps<{
   itemId?: string;
-  mode?: TMPlatformMode;
 }>();
 
 const itemName = computed(() => {
@@ -37,7 +40,7 @@ const itemName = computed(() => {
   return "";
 });
 
-const stations = computed(() => {
+const trainStations = computed(() => {
   if (!props.itemId) {
     return [];
   }
@@ -56,6 +59,17 @@ const stations = computed(() => {
     });
 
     return platformIdx > -1;
+  });
+});
+
+const truckStations = computed(() => {
+  if (!props.itemId) return [];
+  if (!project.value) return [];
+
+  return project.value.truck_stations.filter((truckStation) => {
+    return (
+      truckStation.items.findIndex((item) => item.item_id === props.itemId) > -1
+    );
   });
 });
 </script>

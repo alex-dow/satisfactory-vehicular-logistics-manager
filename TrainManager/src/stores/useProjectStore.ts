@@ -3,17 +3,92 @@ import { ref } from "vue";
 
 import type { TMPlatformItem, TMPlatformMode, TMProject } from "@/api/types";
 
+import ItemAndRateDialog from "@/modals/ItemAndRateDialog.vue";
+
 export const useProjectStore = defineStore("current-project", () => {
   const modified = ref(false);
 
   const project = ref<TMProject | null>(null);
 
   const setCurrentProject = async (p: TMProject | null) => {
-    console.log(
-      "useProjectStore() - set current project and reset modified flag",
-    );
     project.value = JSON.parse(JSON.stringify(p));
     modified.value = false;
+  };
+
+  const addTruckStation = (stationName: string) => {
+    modified.value = true;
+    project.value?.truck_stations.push({
+      station_name: stationName,
+      direction: "load",
+      items: [],
+    });
+  };
+
+  const setTruckStationMode = (stationIdx: number, mode: TMPlatformMode) => {
+    if (!project.value) return;
+    if (stationIdx >= project.value.truck_stations.length) return;
+
+    project.value.truck_stations[stationIdx].direction = mode;
+    modified.value = true;
+  };
+
+  const renameTruckStation = (stationIdx: number, stationName: string) => {
+    if (!project.value) return;
+    if (stationIdx >= project.value.truck_stations.length) return;
+
+    project.value.train_stations[stationIdx].station_name = stationName;
+    modified.value = true;
+  };
+
+  const deleteTruckStation = (stationIdx: number) => {
+    if (!project.value) return;
+    if (stationIdx >= project.value.truck_stations.length) return;
+    project.value.truck_stations.splice(stationIdx, 1);
+    modified.value = true;
+  };
+
+  const addTruckStationItem = (stationIdx: number, item: TMPlatformItem) => {
+    if (!project.value) return;
+    if (stationIdx >= project.value.truck_stations.length) return;
+    project.value.truck_stations[stationIdx].items.push(item);
+    modified.value = true;
+  };
+
+  const removeTruckStationItem = (stationIdx: number, itemIdx: number) => {
+    if (!project.value) {
+      console.error("Removing truck station item when project is not loaded");
+      return;
+    }
+    if (stationIdx >= project.value.truck_stations.length || stationIdx < 0) {
+      console.error("Truck station index " + stationIdx + " does not exist");
+      return;
+    }
+    if (
+      itemIdx >= project.value.truck_stations[stationIdx].items.length ||
+      itemIdx < 0
+    ) {
+      console.error("Item index " + itemIdx + " does not exist");
+      return;
+    }
+    project.value.truck_stations[stationIdx].items.splice(itemIdx, 1);
+    modified.value = true;
+  };
+
+  const updateTruckStationItem = (
+    stationIdx: number,
+    itemIdx: number,
+    item: TMPlatformItem,
+  ) => {
+    if (!project.value) throw new Error("Project not loaded");
+    if (stationIdx < 0 || stationIdx >= project.value.truck_stations.length)
+      throw new Error("Invalid station index: " + stationIdx);
+    if (
+      itemIdx < 0 ||
+      itemIdx >= project.value.truck_stations[stationIdx].items.length
+    )
+      throw new Error("Invalid item idex: " + itemIdx);
+    project.value.truck_stations[stationIdx].items.splice(itemIdx, 1, item);
+    modified.value = true;
   };
 
   const addTrainStation = (stationName: string) => {
@@ -22,6 +97,13 @@ export const useProjectStore = defineStore("current-project", () => {
       station_name: stationName,
       platforms: [],
     });
+  };
+
+  const renameTrainStation = (stationIdx: number, stationName: string) => {
+    if (!project.value) return;
+    if (stationIdx >= project.value.train_stations.length) return;
+    project.value.train_stations[stationIdx].station_name = stationName;
+    modified.value = true;
   };
 
   const removeTrainStation = (stationIndex: number) => {
@@ -100,6 +182,34 @@ export const useProjectStore = defineStore("current-project", () => {
     ].items.splice(itemIndex, 1);
   };
 
+  const updatePlatformItem = (
+    stationIdx: number,
+    platformIdx: number,
+    itemIdx: number,
+    item: TMPlatformItem,
+  ) => {
+    if (!project.value) throw new Error("Project not loaded yet");
+    if (stationIdx < 0 || stationIdx >= project.value.train_stations.length)
+      throw new Error("Invalid station index: " + stationIdx);
+    if (
+      platformIdx < 0 ||
+      platformIdx >= project.value.train_stations[stationIdx].platforms.length
+    )
+      throw new Error("Inalid platform index: " + platformIdx);
+    if (
+      itemIdx < 0 ||
+      itemIdx >=
+        project.value.train_stations[stationIdx].platforms[platformIdx].items
+          .length
+    )
+      throw new Error("Invalid item index: " + itemIdx);
+
+    project.value.train_stations[stationIdx].platforms[
+      platformIdx
+    ].items.splice(itemIdx, 1, item);
+    modified.value = true;
+  };
+
   const resetModifiedState = () => {
     modified.value = false;
   };
@@ -150,17 +260,29 @@ export const useProjectStore = defineStore("current-project", () => {
   return {
     project,
     modified,
+
     setCurrentProject,
+
     addPlatform,
     addTrainStation,
     removeTrainStation,
     removePlatform,
     addPlatformItem,
+    updatePlatformItem,
     removePlatformItem,
     resetModifiedState,
     setPlatformMode,
     togglePlatformMode,
     movePlatformUp,
     movePlatformDown,
+    renameTrainStation,
+
+    renameTruckStation,
+    deleteTruckStation,
+    addTruckStation,
+    addTruckStationItem,
+    removeTruckStationItem,
+    updateTruckStationItem,
+    setTruckStationMode,
   };
 });
