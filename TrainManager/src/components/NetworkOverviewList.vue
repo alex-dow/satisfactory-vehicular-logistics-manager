@@ -151,11 +151,11 @@ const selectedItem = ref<TMPlatformItem | null>(null);
 
 const items = computed(() => {
   if (showList.value === "load") {
-    return availableItems.value;
+    return loadItems.value;
   } else if (showList.value === "unload") {
     return unloadItems.value;
   } else {
-    return loadItems.value;
+    return availableItems.value;
   }
 });
 
@@ -215,9 +215,9 @@ const truckStations = computed<TMTruckStation[]>(() => {
 });
 
 watchEffect(() => {
-  const iItems: Record<string, number> = {};
+  const lItems: Record<string, number> = {};
   const aItems: Record<string, number> = {};
-  const oItems: Record<string, number> = {};
+  const uItems: Record<string, number> = {};
 
   if (network.value === "train") {
     trainStations.value.forEach((trainStation) => {
@@ -225,10 +225,10 @@ watchEffect(() => {
         if (platform.mode === "load") {
           // output
           platform.items.forEach((item) => {
-            if (!oItems[item.item_id]) {
-              oItems[item.item_id] = item.rate;
+            if (!lItems[item.item_id]) {
+              lItems[item.item_id] = item.rate;
             } else {
-              oItems[item.item_id] += item.rate;
+              lItems[item.item_id] += item.rate;
             }
 
             if (!aItems[item.item_id]) {
@@ -240,10 +240,10 @@ watchEffect(() => {
         } else if (platform.mode === "unload") {
           // input
           platform.items.forEach((item) => {
-            if (!iItems[item.item_id]) {
-              iItems[item.item_id] = item.rate;
+            if (!uItems[item.item_id]) {
+              uItems[item.item_id] = item.rate;
             } else {
-              iItems[item.item_id] += item.rate;
+              uItems[item.item_id] += item.rate;
             }
 
             if (!aItems[item.item_id]) {
@@ -259,10 +259,10 @@ watchEffect(() => {
     truckStations.value.forEach((truckStation) => {
       if (truckStation.direction === "load") {
         truckStation.items.forEach((item) => {
-          if (!oItems[item.item_id]) {
-            oItems[item.item_id] = item.rate;
+          if (!lItems[item.item_id]) {
+            lItems[item.item_id] = item.rate;
           } else {
-            oItems[item.item_id] += item.rate;
+            lItems[item.item_id] += item.rate;
           }
 
           if (!aItems[item.item_id]) {
@@ -273,10 +273,10 @@ watchEffect(() => {
         });
       } else {
         truckStation.items.forEach((item) => {
-          if (!iItems[item.item_id]) {
-            iItems[item.item_id] = item.rate;
+          if (!uItems[item.item_id]) {
+            uItems[item.item_id] = item.rate;
           } else {
-            iItems[item.item_id] += item.rate;
+            uItems[item.item_id] += item.rate;
           }
 
           if (!aItems[item.item_id]) {
@@ -289,8 +289,8 @@ watchEffect(() => {
     });
   }
 
-  unloadItems.value = iItems;
+  unloadItems.value = uItems;
   availableItems.value = aItems;
-  loadItems.value = oItems;
+  loadItems.value = lItems;
 });
 </script>
