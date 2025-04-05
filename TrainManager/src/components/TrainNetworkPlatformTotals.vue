@@ -1,4 +1,23 @@
 <template>
+  <Accordion>
+    <AccordionPanel v-for="(platform, idx) in itemTotals" :key="idx" :value="idx">
+      <AccordionHeader class="p-0">
+        <div class="flex items-center gap-2">
+          <img src="/data/items/desc-traindockingstation-c_64.png" style="width: 40px; height: 40px" />
+          <div class="text-xl">Platform #{{ idx + 1 }}</div>
+        </div></AccordionHeader
+      >
+      <AccordionContent>
+        <NetworkOverviewItem
+          v-for="item in platform[props.mode]"
+          :key="item.item_id"
+          :item-id="item.item_id"
+          :rate="item.rate"
+          @click="emit('selectId', item.item_id)"
+        />
+      </AccordionContent>
+    </AccordionPanel>
+    <!--
   <div v-for="(platform, idx) in itemTotals" :key="'platform' + idx" class="flex flex-col">
     <div class="flex items-center gap-2">
       <img src="/data/items/desc-traindockingstation-c_64.png" style="width: 40px; height: 40px" />
@@ -14,11 +33,15 @@
       />
     </div>
   </div>
+-->
+  </Accordion>
 </template>
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { computed, ref, watchEffect } from "vue";
+
+import { Accordion, AccordionPanel, AccordionHeader, AccordionContent } from "primevue";
 
 import NetworkOverviewItem from "./NetworkOverviewItem.vue";
 

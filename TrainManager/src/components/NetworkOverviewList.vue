@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-grow flex-col gap-2">
+  <div class="flex flex-grow flex-col">
     <div class="w-full border-b-2 border-orange-800 text-center text-lg font-bold">Logistics Overview</div>
     <div class="flex w-full gap-2 p-2">
       <div class="flex w-1/2 flex-col gap-2">
