@@ -1,10 +1,6 @@
 <template>
   <div class="flex flex-grow flex-col gap-2">
-    <div
-      class="w-full border-b-2 border-orange-800 text-center text-lg font-bold"
-    >
-      Logistics Overview
-    </div>
+    <div class="w-full border-b-2 border-orange-800 text-center text-lg font-bold">Logistics Overview</div>
     <div class="flex w-full gap-2 p-2">
       <div class="flex w-1/2 flex-col gap-2">
         <SingleSelectSmall
@@ -16,8 +12,8 @@
           option-value="value"
         />
         <SingleSelectSmall
-          id="network-overview-list-type-select"
-          v-model="showList"
+          id="network-overview-platform-mode-select"
+          v-model="platformMode"
           label="List type:"
           :options="listTypeOptions"
           option-label="label"
@@ -43,47 +39,36 @@
         />
       </div>
     </div>
-
-    <div
-      class="flex flex-col gap-1 p-2"
-      data-component="platform-items-container"
-    >
-      <template v-if="sortBy === 'name'">
-        <NetworkOverviewItem
-          v-for="itemId in sortedByName"
-          :key="itemId"
-          :item-id="itemId"
-          :rate="items[itemId]"
-        />
-      </template>
-      <template v-else>
-        <NetworkOverviewItem
-          v-for="itemId in sortedByRate"
-          :key="itemId"
-          :item-id="itemId"
-          :rate="items[itemId]"
-        />
-      </template>
+    <div v-if="network === 'train'" class="flex w-full p-2">
+      <div class="flex items-center gap-2">
+        <Checkbox v-model="showByPlatform" input-id="show-by-platform-input" name="show-by-platform" binary />
+        <label for="show-by-platform-input">Sort items by station platforms</label>
+      </div>
     </div>
+
+    <div class="flex flex-col gap-1 p-2" data-component="platform-items-container">
+      <TrainNetworkOverviewTotals v-if="network === 'train' && showByPlatform === false" :sort-by="sortBy" :mode="platformMode" />
+      <TrainNetworkPlatformTotals v-else-if="network === 'train' && showByPlatform === true" :sort-by="sortBy" :mode="platformMode" />
+      <!--
+      <template v-if="showByPlatform"> </template>
+      <template v-else>
+        <NetworkOverviewItem v-for="item in items" :key="item.item_id" :item-id="item.item_id" :rate="item.rate" />
+      </template>
+    --></div>
   </div>
-  <ItemDetailsDialog v-model="showItemDetailsDialog" />
+  <!--<ItemDetailsDialog v-model="showItemDetailsDialog" />-->
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
-import { computed, ref, watchEffect } from "vue";
+import { ref } from "vue";
 
-import NetworkOverviewItem from "./NetworkOverviewItem.vue";
+import { Checkbox } from "primevue";
+
 import SingleSelectSmall from "./SingleSelectSmall.vue";
+import TrainNetworkOverviewTotals from "./TrainNetworkOverviewTotals.vue";
+import TrainNetworkPlatformTotals from "./TrainNetworkPlatformTotals.vue";
 
-import {
-  type TMTruckStation,
-  type TMTrainStation,
-  TMPlatformItem,
-} from "@/api/types";
-import ItemDetailsDialog from "@/modals/ItemDetailsDialog.vue";
-import { useProjectStore } from "@/stores/useProjectStore";
-import { useSatisfactoryStore } from "@/stores/useSatisfactoryStore";
+import { type TMPlatformMode, type TMNetwork } from "@/api/types";
 
 const networkSelectOptions = [
   {
@@ -137,160 +122,11 @@ const sortDirOptions = [
   },
 ];
 
-const sfyStore = useSatisfactoryStore();
-const projectStore = useProjectStore();
-const { project } = storeToRefs(projectStore);
-
 const sortDir = ref<"asc" | "desc">("asc");
 const sortBy = ref<"name" | "rate">("name");
-const showList = ref<"load" | "unload" | "available">("available");
-const network = ref<"truck" | "train" | "drone">("train");
+const platformMode = ref<TMPlatformMode>("available");
+const network = ref<TMNetwork>("train");
+const showByPlatform = ref(false);
 
 const showItemDetailsDialog = ref(false);
-const selectedItem = ref<TMPlatformItem | null>(null);
-
-const items = computed(() => {
-  if (showList.value === "load") {
-    return loadItems.value;
-  } else if (showList.value === "unload") {
-    return unloadItems.value;
-  } else {
-    return availableItems.value;
-  }
-});
-
-const sortedByRate = computed(() => {
-  if (sortDir.value === "desc") {
-    return Object.keys(items.value).sort((a, b) => {
-      return items.value[b] > items.value[a]
-        ? 1
-        : items.value[b] < items.value[a]
-          ? -1
-          : 0;
-    });
-  } else {
-    return Object.keys(items.value).sort((a, b) => {
-      return items.value[a] > items.value[b]
-        ? 1
-        : items.value[a] < items.value[b]
-          ? -1
-          : 0;
-    });
-  }
-});
-
-const sortedByName = computed(() => {
-  if (sfyStore.items === null) {
-    return Object.keys(items.value);
-  } else if (sortDir.value === "asc") {
-    return Object.keys(items.value).sort((a, b) => {
-      if (sfyStore.items[a] && sfyStore.items[b]) {
-        return sfyStore.items[a].name.localeCompare(sfyStore.items[b].name);
-      } else {
-        return 0;
-      }
-    });
-  } else if (sortDir.value === "desc") {
-    return Object.keys(items.value).sort((a, b) => {
-      if (sfyStore.items[a] && sfyStore.items[b]) {
-        return sfyStore.items[b].name.localeCompare(sfyStore.items[a].name);
-      } else {
-        return 0;
-      }
-    });
-  }
-  return Object.keys(items.value);
-});
-
-const loadItems = ref<Record<string, number>>({});
-const unloadItems = ref<Record<string, number>>({});
-const availableItems = ref<Record<string, number>>({});
-
-const trainStations = computed<TMTrainStation[]>(() => {
-  return project.value ? project.value.train_stations : [];
-});
-
-const truckStations = computed<TMTruckStation[]>(() => {
-  return project.value ? project.value.truck_stations : [];
-});
-
-watchEffect(() => {
-  const lItems: Record<string, number> = {};
-  const aItems: Record<string, number> = {};
-  const uItems: Record<string, number> = {};
-
-  if (network.value === "train") {
-    trainStations.value.forEach((trainStation) => {
-      trainStation.platforms.forEach((platform) => {
-        if (platform.mode === "load") {
-          // output
-          platform.items.forEach((item) => {
-            if (!lItems[item.item_id]) {
-              lItems[item.item_id] = item.rate;
-            } else {
-              lItems[item.item_id] += item.rate;
-            }
-
-            if (!aItems[item.item_id]) {
-              aItems[item.item_id] = item.rate;
-            } else {
-              aItems[item.item_id] += item.rate;
-            }
-          });
-        } else if (platform.mode === "unload") {
-          // input
-          platform.items.forEach((item) => {
-            if (!uItems[item.item_id]) {
-              uItems[item.item_id] = item.rate;
-            } else {
-              uItems[item.item_id] += item.rate;
-            }
-
-            if (!aItems[item.item_id]) {
-              aItems[item.item_id] = -item.rate;
-            } else {
-              aItems[item.item_id] -= item.rate;
-            }
-          });
-        }
-      });
-    });
-  } else if (network.value === "truck") {
-    truckStations.value.forEach((truckStation) => {
-      if (truckStation.direction === "load") {
-        truckStation.items.forEach((item) => {
-          if (!lItems[item.item_id]) {
-            lItems[item.item_id] = item.rate;
-          } else {
-            lItems[item.item_id] += item.rate;
-          }
-
-          if (!aItems[item.item_id]) {
-            aItems[item.item_id] = item.rate;
-          } else {
-            aItems[item.item_id] += item.rate;
-          }
-        });
-      } else {
-        truckStation.items.forEach((item) => {
-          if (!uItems[item.item_id]) {
-            uItems[item.item_id] = item.rate;
-          } else {
-            uItems[item.item_id] += item.rate;
-          }
-
-          if (!aItems[item.item_id]) {
-            aItems[item.item_id] = -item.rate;
-          } else {
-            aItems[item.item_id] -= item.rate;
-          }
-        });
-      }
-    });
-  }
-
-  unloadItems.value = uItems;
-  availableItems.value = aItems;
-  loadItems.value = lItems;
-});
 </script>

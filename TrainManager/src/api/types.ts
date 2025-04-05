@@ -40,4 +40,6 @@ export interface TMProject {
   drone_stations: TMDroneStation[];
 }
 
-export type TMPlatformMode = "load" | "unload";
+export type TMPlatformMode = "load" | "unload" | "available";
+
+export type TMNetwork = "truck" | "train" | "drone";
