@@ -1,9 +1,7 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 
 import type { TMPlatformItem, TMPlatformMode, TMProject } from "@/api/types";
-
-import ItemAndRateDialog from "@/modals/ItemAndRateDialog.vue";
 
 export const useProjectStore = defineStore("current-project", () => {
   const modified = ref(false);
@@ -63,10 +61,7 @@ export const useProjectStore = defineStore("current-project", () => {
       console.error("Truck station index " + stationIdx + " does not exist");
       return;
     }
-    if (
-      itemIdx >= project.value.truck_stations[stationIdx].items.length ||
-      itemIdx < 0
-    ) {
+    if (itemIdx >= project.value.truck_stations[stationIdx].items.length || itemIdx < 0) {
       console.error("Item index " + itemIdx + " does not exist");
       return;
     }
@@ -74,19 +69,10 @@ export const useProjectStore = defineStore("current-project", () => {
     modified.value = true;
   };
 
-  const updateTruckStationItem = (
-    stationIdx: number,
-    itemIdx: number,
-    item: TMPlatformItem,
-  ) => {
+  const updateTruckStationItem = (stationIdx: number, itemIdx: number, item: TMPlatformItem) => {
     if (!project.value) throw new Error("Project not loaded");
-    if (stationIdx < 0 || stationIdx >= project.value.truck_stations.length)
-      throw new Error("Invalid station index: " + stationIdx);
-    if (
-      itemIdx < 0 ||
-      itemIdx >= project.value.truck_stations[stationIdx].items.length
-    )
-      throw new Error("Invalid item idex: " + itemIdx);
+    if (stationIdx < 0 || stationIdx >= project.value.truck_stations.length) throw new Error("Invalid station index: " + stationIdx);
+    if (itemIdx < 0 || itemIdx >= project.value.truck_stations[stationIdx].items.length) throw new Error("Invalid item idex: " + itemIdx);
     project.value.truck_stations[stationIdx].items.splice(itemIdx, 1, item);
     modified.value = true;
   };
@@ -113,25 +99,17 @@ export const useProjectStore = defineStore("current-project", () => {
 
   const togglePlatformMode = (stationIndex: number, platformIndex: number) => {
     if (!project.value) return;
-    if (
-      project.value.train_stations[stationIndex].platforms[platformIndex]
-        .mode === "load"
-    ) {
+    if (project.value.train_stations[stationIndex].platforms[platformIndex].mode === "load") {
       setPlatformMode(stationIndex, platformIndex, "unload");
     } else {
       setPlatformMode(stationIndex, platformIndex, "load");
     }
   };
 
-  const setPlatformMode = (
-    stationIndex: number,
-    platformIndex: number,
-    mode: TMPlatformMode,
-  ) => {
+  const setPlatformMode = (stationIndex: number, platformIndex: number, mode: TMPlatformMode) => {
     modified.value = true;
     if (!project.value) return;
-    project.value.train_stations[stationIndex].platforms[platformIndex].mode =
-      mode;
+    project.value.train_stations[stationIndex].platforms[platformIndex].mode = mode;
   };
 
   const addPlatform = (stationIndex: number) => {
@@ -141,9 +119,7 @@ export const useProjectStore = defineStore("current-project", () => {
     }
 
     if (stationIndex >= project.value.train_stations.length) {
-      throw new Error(
-        "Adding a platform to a station that does not exist in the current project",
-      );
+      throw new Error("Adding a platform to a station that does not exist in the current project");
     }
 
     project.value?.train_stations[stationIndex].platforms.push({
@@ -154,59 +130,28 @@ export const useProjectStore = defineStore("current-project", () => {
 
   const removePlatform = (stationIndex: number, platformIndex: number) => {
     modified.value = true;
-    project.value?.train_stations[stationIndex].platforms.splice(
-      platformIndex,
-      1,
-    );
+    project.value?.train_stations[stationIndex].platforms.splice(platformIndex, 1);
   };
 
-  const addPlatformItem = (
-    stationIndex: number,
-    platformIndex: number,
-    item: TMPlatformItem,
-  ) => {
+  const addPlatformItem = (stationIndex: number, platformIndex: number, item: TMPlatformItem) => {
     modified.value = true;
-    project.value?.train_stations[stationIndex].platforms[
-      platformIndex
-    ].items.push(item);
+    project.value?.train_stations[stationIndex].platforms[platformIndex].items.push(item);
   };
 
-  const removePlatformItem = (
-    stationIndex: number,
-    platformIndex: number,
-    itemIndex: number,
-  ) => {
+  const removePlatformItem = (stationIndex: number, platformIndex: number, itemIndex: number) => {
     modified.value = true;
-    project.value?.train_stations[stationIndex].platforms[
-      platformIndex
-    ].items.splice(itemIndex, 1);
+    project.value?.train_stations[stationIndex].platforms[platformIndex].items.splice(itemIndex, 1);
   };
 
-  const updatePlatformItem = (
-    stationIdx: number,
-    platformIdx: number,
-    itemIdx: number,
-    item: TMPlatformItem,
-  ) => {
+  const updatePlatformItem = (stationIdx: number, platformIdx: number, itemIdx: number, item: TMPlatformItem) => {
     if (!project.value) throw new Error("Project not loaded yet");
-    if (stationIdx < 0 || stationIdx >= project.value.train_stations.length)
-      throw new Error("Invalid station index: " + stationIdx);
-    if (
-      platformIdx < 0 ||
-      platformIdx >= project.value.train_stations[stationIdx].platforms.length
-    )
+    if (stationIdx < 0 || stationIdx >= project.value.train_stations.length) throw new Error("Invalid station index: " + stationIdx);
+    if (platformIdx < 0 || platformIdx >= project.value.train_stations[stationIdx].platforms.length)
       throw new Error("Inalid platform index: " + platformIdx);
-    if (
-      itemIdx < 0 ||
-      itemIdx >=
-        project.value.train_stations[stationIdx].platforms[platformIdx].items
-          .length
-    )
+    if (itemIdx < 0 || itemIdx >= project.value.train_stations[stationIdx].platforms[platformIdx].items.length)
       throw new Error("Invalid item index: " + itemIdx);
 
-    project.value.train_stations[stationIdx].platforms[
-      platformIdx
-    ].items.splice(itemIdx, 1, item);
+    project.value.train_stations[stationIdx].platforms[platformIdx].items.splice(itemIdx, 1, item);
     modified.value = true;
   };
 
@@ -219,41 +164,22 @@ export const useProjectStore = defineStore("current-project", () => {
       return;
     }
 
-    const platform =
-      project.value?.train_stations[stationIndex].platforms[platformIndex];
+    const platform = project.value?.train_stations[stationIndex].platforms[platformIndex];
 
-    project.value?.train_stations[stationIndex].platforms.splice(
-      platformIndex,
-      1,
-    );
-    project.value?.train_stations[stationIndex].platforms.splice(
-      platformIndex - 1,
-      0,
-      platform,
-    );
+    project.value?.train_stations[stationIndex].platforms.splice(platformIndex, 1);
+    project.value?.train_stations[stationIndex].platforms.splice(platformIndex - 1, 0, platform);
     modified.value = true;
   };
 
   const movePlatformDown = (stationIndex: number, platformIndex: number) => {
-    if (
-      platformIndex >=
-      project.value?.train_stations[stationIndex].platforms.length - 1
-    ) {
+    if (platformIndex >= project.value?.train_stations[stationIndex].platforms.length - 1) {
       return;
     }
 
-    const platform =
-      project.value?.train_stations[stationIndex].platforms[platformIndex];
+    const platform = project.value?.train_stations[stationIndex].platforms[platformIndex];
 
-    project.value?.train_stations[stationIndex].platforms.splice(
-      platformIndex,
-      1,
-    );
-    project.value?.train_stations[stationIndex].platforms.splice(
-      platformIndex + 1,
-      0,
-      platform,
-    );
+    project.value?.train_stations[stationIndex].platforms.splice(platformIndex, 1);
+    project.value?.train_stations[stationIndex].platforms.splice(platformIndex + 1, 0, platform);
     modified.value = true;
   };
 

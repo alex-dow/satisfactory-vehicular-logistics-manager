@@ -47,16 +47,21 @@
     </div>
 
     <div class="flex flex-col gap-1 p-2" data-component="platform-items-container">
-      <TrainNetworkOverviewTotals v-if="network === 'train' && showByPlatform === false" :sort-by="sortBy" :mode="platformMode" />
-      <TrainNetworkPlatformTotals v-else-if="network === 'train' && showByPlatform === true" :sort-by="sortBy" :mode="platformMode" />
-      <!--
-      <template v-if="showByPlatform"> </template>
-      <template v-else>
-        <NetworkOverviewItem v-for="item in items" :key="item.item_id" :item-id="item.item_id" :rate="item.rate" />
-      </template>
-    --></div>
+      <TrainNetworkOverviewTotals
+        v-if="network === 'train' && showByPlatform === false"
+        :sort-by="sortBy"
+        :mode="platformMode"
+        @select-id="onSelectItem"
+      />
+      <TrainNetworkPlatformTotals
+        v-else-if="network === 'train' && showByPlatform === true"
+        :sort-by="sortBy"
+        :mode="platformMode"
+        @select-id="onSelectItem"
+      />
+    </div>
   </div>
-  <!--<ItemDetailsDialog v-model="showItemDetailsDialog" />-->
+  <ItemDetailsDialog v-model="showItemDetailsDialog" :item-id="selectedItemId" />
 </template>
 
 <script lang="ts" setup>
@@ -69,6 +74,7 @@ import TrainNetworkOverviewTotals from "./TrainNetworkOverviewTotals.vue";
 import TrainNetworkPlatformTotals from "./TrainNetworkPlatformTotals.vue";
 
 import { type TMPlatformMode, type TMNetwork } from "@/api/types";
+import ItemDetailsDialog from "@/modals/ItemDetailsDialog.vue";
 
 const networkSelectOptions = [
   {
@@ -129,4 +135,9 @@ const network = ref<TMNetwork>("train");
 const showByPlatform = ref(false);
 
 const showItemDetailsDialog = ref(false);
+const selectedItemId = ref<string>("");
+const onSelectItem = (itemId: string) => {
+  selectedItemId.value = itemId;
+  showItemDetailsDialog.value = true;
+};
 </script>

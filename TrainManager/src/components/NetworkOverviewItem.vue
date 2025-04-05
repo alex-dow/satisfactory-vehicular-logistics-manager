@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="flex flex-wrap items-center gap-2 rounded-md p-0.5"
-    :class="bgColor"
-  >
+  <div class="flex flex-wrap items-center gap-2 rounded-md p-0.5" :class="bgColor">
     <ItemIcon :item-id="props.itemId" style="width: 32px; height: 32px" />
     <div class="xs:hidden flex sm:hidden md:block">
       <div class="text-xs sm:hidden md:block">

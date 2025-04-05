@@ -1,5 +1,11 @@
 <template>
-  <NetworkOverviewItem v-for="item in items" :key="item.item_id" :item-id="item.item_id" :rate="item.rate" />
+  <NetworkOverviewItem
+    v-for="item in items"
+    :key="item.item_id"
+    :item-id="item.item_id"
+    :rate="item.rate"
+    @click="emit('selectId', item.item_id)"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -16,6 +22,10 @@ import { trainStationItemTotals } from "@/utils/stationData";
 const props = defineProps<{
   sortBy: "name" | "rate";
   mode: TMPlatformMode;
+}>();
+
+const emit = defineEmits<{
+  selectId: [itemId: string];
 }>();
 
 const projectStore = useProjectStore();

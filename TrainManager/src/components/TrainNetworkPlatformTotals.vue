@@ -5,7 +5,13 @@
       <div class="text-xl">Platform #{{ idx + 1 }}</div>
     </div>
     <div>
-      <NetworkOverviewItem v-for="item in platform[props.mode]" :key="item.item_id" :item-id="item.item_id" :rate="item.rate" />
+      <NetworkOverviewItem
+        v-for="item in platform[props.mode]"
+        :key="item.item_id"
+        :item-id="item.item_id"
+        :rate="item.rate"
+        @click="emit('selectId', item.item_id)"
+      />
     </div>
   </div>
 </template>
@@ -27,6 +33,10 @@ const props = defineProps<{
   mode: TMPlatformMode;
 }>();
 
+const emit = defineEmits<{
+  selectId: [itemId: string];
+}>();
+
 const projectStore = useProjectStore();
 const sfyStore = useSatisfactoryStore();
 
@@ -39,9 +49,7 @@ const trainStations = computed(() => {
   return [];
 });
 
-const itemTotals = ref<ItemTotals[]>([]);
-
-watchEffect(() => {
-  itemTotals.value = trainStationPlatformItemTotals(trainStations.value);
+const itemTotals = computed(() => {
+  return trainStationPlatformItemTotals(trainStations.value);
 });
 </script>

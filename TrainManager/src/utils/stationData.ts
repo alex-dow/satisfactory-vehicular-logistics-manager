@@ -95,7 +95,7 @@ export const trainStationItemTotals = (trainStations: TMTrainStation[]) => {
           itemIndices["available"][item.item_id] = itemIndex;
 
           if (platform.mode === "load") {
-            items["available"].push(item);
+            items["available"].push({ ...item, rate: item.rate });
           } else {
             items["available"].push({ ...item, rate: -item.rate });
           }

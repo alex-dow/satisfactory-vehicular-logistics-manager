@@ -1,12 +1,20 @@
 <template>
-  <Dialog v-model:visible="visible" modal header="Stations" :min-x="400">
-    <p>Train Stations with {{ itemName }}</p>
-    <div v-for="trainStation in trainStations" :key="trainStation.station_name">
-      {{ trainStation.station_name }}
-    </div>
-    <p>Truck Stations with {{ itemName }}</p>
-    <div v-for="truckStation in truckStations" :key="truckStation.station_name">
-      {{ truckStation.station_name }}
+  <Dialog v-model:visible="visible" modal header="Stations" :min-x="400" :style="{ width: '55rem' }">
+    <div class="flex w-full gap-2">
+      <div class="flex w-1/3 flex-col">
+        <h4 class="font-bold">Train Stations</h4>
+        <ul>
+          <li v-for="(trainStation, idx) in trainStations" :key="trainStation.station_name">
+            <router-link :to="{ name: 'train-station', params: { itemId: idx } }">{{ trainStation.station_name }}</router-link>
+          </li>
+        </ul>
+      </div>
+      <div class="flex w-1/3 flex-col">
+        <h4 class="font-bold">Truck Stations</h4>
+      </div>
+      <div class="font w-1/3 flex-col">
+        <h4 class="text-bold">Drone Stations</h4>
+      </div>
     </div>
   </Dialog>
 </template>
@@ -53,9 +61,7 @@ const trainStations = computed(() => {
     const platformIdx = trainStation.platforms.findIndex((platform) => {
       if (props.mode && platform.mode !== props.mode) return false;
 
-      return (
-        platform.items.findIndex((item) => item.item_id === props.itemId) > -1
-      );
+      return platform.items.findIndex((item) => item.item_id === props.itemId) > -1;
     });
 
     return platformIdx > -1;
@@ -67,9 +73,7 @@ const truckStations = computed(() => {
   if (!project.value) return [];
 
   return project.value.truck_stations.filter((truckStation) => {
-    return (
-      truckStation.items.findIndex((item) => item.item_id === props.itemId) > -1
-    );
+    return truckStation.items.findIndex((item) => item.item_id === props.itemId) > -1;
   });
 });
 </script>
