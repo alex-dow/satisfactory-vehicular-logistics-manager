@@ -77,6 +77,90 @@ export const useProjectStore = defineStore("current-project", () => {
     modified.value = true;
   };
 
+  const addTrainConsist = (consistName: string) => {
+    modified.value = true;
+    project.value?.train_consists.push({
+      consist_name: consistName,
+      railcars: [],
+    });
+  };
+
+  const renameTrainConsist = (consistIdx: number, consistName: string) => {
+    if (!project.value) return;
+    if (consistIdx >= project.value.train_consists.length) return;
+    modified.value = true;
+    project.value.train_consists[consistIdx].consist_name = consistName;
+  };
+
+  const removeTrainConsist = (consistIdx: number) => {
+    modified.value = true;
+    project.value?.train_consists.splice(consistIdx, 1);
+  };
+
+  const addRailcar = (consistIdx: number) => {
+    modified.value = true;
+    project.value?.train_consists[consistIdx].railcars.push({
+      items: [],
+    });
+  };
+
+  const removeRailcar = (consistIdx: number, railcarIdx: number) => {
+    modified.value = true;
+    project.value?.train_consists[consistIdx].railcars.splice(railcarIdx, 1);
+  };
+
+  const addRailcarItem = (consistIdx: number, railcarIdx: number, item: TMPlatformItem) => {
+    modified.value = true;
+    project.value?.train_consists[consistIdx].railcars[railcarIdx].items.push(item);
+  };
+
+  const removeRailcarItem = (consistIdx: number, railcarIdx: number, itemIdx: number) => {
+    modified.value = true;
+    project.value?.train_consists[consistIdx].railcars[railcarIdx].items.splice(itemIdx, 1);
+  };
+
+  const updateRailcarItem = (consistIdx: number, railcarIdx: number, itemIdx: number, item: TMPlatformItem) => {
+    modified.value = true;
+    project.value?.train_consists[consistIdx].railcars[railcarIdx].items.splice(itemIdx, 1, item);
+  };
+
+  const moveRailcarUp = (consistIndex: number, railcarIndex: number) => {
+    console.log("move rail car up", consistIndex, railcarIndex);
+    if (!project.value) return;
+
+    if (consistIndex >= project.value.train_consists.length) {
+      return;
+    }
+
+    if (railcarIndex === 0 || railcarIndex >= project.value.train_consists[consistIndex].railcars.length) {
+      return;
+    }
+
+    const railcar = project.value.train_consists[consistIndex].railcars[railcarIndex];
+
+    project.value.train_consists[consistIndex].railcars.splice(railcarIndex, 1);
+    project.value.train_consists[consistIndex].railcars.splice(railcarIndex - 1, 0, railcar);
+    modified.value = true;
+  };
+
+  const moveRailcarDown = (consistIndex: number, railcarIndex: number) => {
+    if (!project.value) return;
+
+    if (consistIndex >= project.value.train_consists.length) {
+      return;
+    }
+
+    if (railcarIndex >= project.value.train_consists[consistIndex].railcars.length) {
+      return;
+    }
+
+    const railcar = project.value.train_consists[consistIndex].railcars[railcarIndex];
+    project.value.train_consists[consistIndex].railcars.splice(railcarIndex, 1);
+    project.value.train_consists[consistIndex].railcars.splice(railcarIndex + 1, 0, railcar);
+
+    modified.value = true;
+  };
+
   const addTrainStation = (stationName: string) => {
     modified.value = true;
     project.value?.train_stations.push({
@@ -160,6 +244,9 @@ export const useProjectStore = defineStore("current-project", () => {
   };
 
   const movePlatformUp = (stationIndex: number, platformIndex: number) => {
+    if (!project.value) return;
+    if (stationIndex >= project.value.train_stations.length) return;
+    if (platformIndex === 0 || platformIndex >= project.value.train_stations[stationIndex].platforms.length) return;
     if (platformIndex == 0) {
       return;
     }
@@ -202,6 +289,17 @@ export const useProjectStore = defineStore("current-project", () => {
     movePlatformUp,
     movePlatformDown,
     renameTrainStation,
+
+    addTrainConsist,
+    removeTrainConsist,
+    renameTrainConsist,
+    addRailcar,
+    removeRailcar,
+    addRailcarItem,
+    removeRailcarItem,
+    updateRailcarItem,
+    moveRailcarDown,
+    moveRailcarUp,
 
     renameTruckStation,
     deleteTruckStation,

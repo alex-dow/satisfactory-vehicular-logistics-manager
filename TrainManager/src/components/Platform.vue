@@ -4,9 +4,7 @@
       <div>
         <OhVueIcon :name="iconName" scale="1.5" />
       </div>
-      <div class="text-2xl font-extrabold text-orange-500 drop-shadow-lg">
-        Platform #{{ platformNumber }}
-      </div>
+      <div class="text-2xl font-extrabold text-orange-500 drop-shadow-lg">Platform #{{ platformNumber }}</div>
       <div class="ml-auto flex flex-col gap-1">
         <div>
           <Select
@@ -54,13 +52,7 @@
             variant="outlined"
             size="small"
             class="w-7 p-0"
-            @click="
-              () =>
-                projectStore.movePlatformUp(
-                  props.stationIndex,
-                  props.platformIndex,
-                )
-            "
+            @click="() => projectStore.movePlatformUp(props.stationIndex, props.platformIndex)"
           />
           <Button
             v-tooltip="{ value: 'Move Down', showDelay: 500 }"
@@ -70,13 +62,7 @@
             variant="outlined"
             size="small"
             class="w-7 p-0"
-            @click="
-              () =>
-                projectStore.movePlatformDown(
-                  props.stationIndex,
-                  props.platformIndex,
-                )
-            "
+            @click="() => projectStore.movePlatformDown(props.stationIndex, props.platformIndex)"
           />
         </div>
       </div>
@@ -85,23 +71,12 @@
       <PlatformItem
         v-for="(item, idx) in platform?.items"
         :key="item.item_id"
-        :platform-index="props.platformIndex"
-        :station-index="props.stationIndex"
+        :item="item"
         :item-index="idx"
         @edit-item="onEditItem($event)"
+        @delete-item="onDeleteItem($event)"
       />
     </div>
-
-    <ItemAndRateDialog
-      v-model="showAddItemDialog"
-      header="Add Item"
-      network="train"
-      :station-idx="props.stationIndex"
-      :platform-idx="props.platformIndex"
-      :item-id="editingItem?.item_id"
-      :rate="editingItem?.rate"
-      @submit="onSaveItem"
-    />
   </div>
 </template>
 
@@ -114,12 +89,7 @@ import { Button, Select } from "primevue";
 
 import PlatformItem from "./PlatformItem.vue";
 
-import type {
-  TMPlatform,
-  TMPlatformItem,
-  TMPlatformMode,
-  TMTrainStation,
-} from "@/api/types";
+import type { TMPlatform, TMPlatformItem, TMPlatformMode, TMTrainStation } from "@/api/types";
 
 import AddPlatformItemDialog from "@/modals/AddPlatformItem.vue";
 import ItemAndRateDialog from "@/modals/ItemAndRateDialog.vue";
@@ -130,38 +100,22 @@ const props = defineProps<{
   stationIndex: number;
 }>();
 
-const showAddItemDialog = ref(false);
+const emit = defineEmits<{
+  "edit-item": [platformIndex: number, itemIndex: number, item: TMPlatformItem];
+  "delete-item": [platformIndex: number, itemIndex: number];
+  "add-item": [platformIndex: number];
+}>();
 
 const onAddItem = () => {
-  showAddItemDialog.value = true;
+  emit("add-item", props.platformIndex);
 };
-
-const editingItem = ref<TMPlatformItem | null>(null);
-const editingItemIndex = ref<number | null>(null);
 
 const onEditItem = (itemIdx: number) => {
-  const platformItem = platform.value.items[itemIdx];
-  if (platformItem) {
-    editingItem.value = platformItem;
-    editingItemIndex.value = itemIdx;
-    showAddItemDialog.value = true;
-  }
+  emit("edit-item", props.platformIndex, itemIdx, platform.value.items[itemIdx]);
 };
 
-const onSaveItem = (item: TMPlatformItem) => {
-  if (editingItemIndex.value != null) {
-    projectStore.updatePlatformItem(
-      props.stationIndex,
-      props.platformIndex,
-      editingItemIndex.value,
-      item,
-    );
-
-    editingItem.value = null;
-    editingItemIndex.value = null;
-  } else {
-    projectStore.addPlatformItem(props.stationIndex, props.platformIndex, item);
-  }
+const onDeleteItem = (itemIdx: number) => {
+  projectStore.removePlatformItem(props.stationIndex, props.platformIndex, itemIdx);
 };
 
 const projectStore = useProjectStore();

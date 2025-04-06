@@ -23,6 +23,7 @@ const ProfilePage = () => import("./pages/ProfilePage.vue");
 const ProjectPage = () => import("./pages/ProjectPage.vue");
 const ProjectsPage = () => import("./pages/ProjectsPage.vue");
 const TrainStationPage = () => import("./pages/TrainStationPage.vue");
+const TrainConsistPage = () => import("./pages/TrainConsistPage.vue");
 
 const routes = [
   {
@@ -45,6 +46,11 @@ const routes = [
             path: "train-stations/:itemId",
             component: TrainStationPage,
             name: "train-station",
+          },
+          {
+            path: "train-consists/:itemId",
+            component: TrainConsistPage,
+            name: "train-consist",
           },
         ],
       },

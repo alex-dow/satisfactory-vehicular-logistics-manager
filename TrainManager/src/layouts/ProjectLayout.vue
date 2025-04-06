@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="isLoading"
-    class="flex w-full flex-grow flex-col items-center justify-center"
-  >
+  <div v-if="isLoading" class="flex w-full flex-grow flex-col items-center justify-center">
     <Spinner />
   </div>
   <div v-else class="flex w-full flex-grow flex-col">
@@ -11,20 +8,8 @@
         {{ project?.project_name }}
       </h4>
       <div class="ml-auto flex gap-2">
-        <Button
-          icon="pi pi-file-export"
-          label="Export Project"
-          severity="success"
-          outlined
-          @click="() => exportProject()"
-        />
-        <Button
-          icon="pi pi-trash"
-          severity="danger"
-          outlined
-          label="Delete Project"
-          @click="(e) => confirmDeleteProject(e)"
-        />
+        <Button icon="pi pi-file-export" label="Export Project" severity="success" outlined @click="() => exportProject()" />
+        <Button icon="pi pi-trash" severity="danger" outlined label="Delete Project" @click="(e) => confirmDeleteProject(e)" />
         <ProjectAutoSave :interval="5" />
       </div>
     </div>
@@ -46,160 +31,23 @@
             @add="showAddTrainStationDialog = true"
             @delete="deleteTrainStation"
           />
-          <!--
-          <AccordionPanel value="0">
-            <AccordionHeader
-              :pt="{
-                root: {
-                  class: 'p-0 m-0 border-b-2 border-orange-900 !rounded-none',
-                },
-                toggleicon: {
-                  class: 'pr-1',
-                },
-              }"
-            >
-              <div class="flex items-center gap-2 p-1">
-                <Button
-                  v-tooltip="'Create a new train station'"
-                  icon="pi pi-plus"
-                  size="small"
-                  rounded
-                  raised
-                  variant="text"
-                  class="m-1 !h-5 !w-5"
-                  @click.stop="() => (showAddTrainStationDialog = true)"
-                />
-                <div class="text-sm font-bold uppercase text-gray-500">
-                  Train Stations
-                </div>
-                <Badge :value="trainStations.length" />
-              </div>
-            </AccordionHeader>
-
-            <AccordionContent>
-              <div
-                v-for="(trainStation, trainStationIdx) in trainStations"
-                :key="trainStation.station_name"
-                class="mt-2 flex w-full items-center gap-2 hover:bg-surface-700"
-              >
-                <div>
-                  <Checkbox
-                    v-model="selectedTrainStations"
-                    :value="trainStationIdx"
-                  ></Checkbox>
-                </div>
-                <div>
-                  <img
-                    src="/data/items/desc-trainstation-c_64.png"
-                    style="width: 24px; height: 24px"
-                  />
-                </div>
-                <p class="m-0 p-0">
-                  <RouterLink
-                    :to="{
-                      name: 'train-station',
-                      params: { projectId, stationIndex: trainStationIdx },
-                    }"
-                  >
-                    {{ trainStation.station_name }}
-                  </RouterLink>
-                </p>
-                <div class="ml-auto">
-                  <Button
-                    v-tooltip="'Delete train station'"
-                    icon="pi pi-trash"
-                    size="small"
-                    variant="text"
-                    raised
-                    rounded
-                    severity="danger"
-                    aria-label="Delete train station"
-                    class="!h-4 !w-4"
-                    @click="
-                      ($e) => confirmDeleteTrainStation($el, trainStationIdx)
-                    "
-                  />
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionPanel>
-        -->
         </Accordion>
-
-        <!--
-        <div class="flex w-full items-center border-b-2 border-b-orange-500">
-          <div class="mr-1">
-            <i class="pi pi-angle-right" />
-          </div>
-          <p
-            v-if="selectedTrainStations.length == 0"
-            class="m-0 p-0 text-sm font-bold uppercase text-gray-500"
-          >
-            Train Stations <Badge>12</Badge>
-          </p>
-          <Button
-            v-else
-            severity="danger"
-            size="small"
-            icon="pi pi-trash"
-            label="Delete train stations"
+        <Accordion value="1">
+          <LeftColumnAccordionPanel
+            delete-message="Are you sure you want to delete this train consist?"
+            header-label="Train Consists"
+            icon="/data/items/desc-freightwagon-c_64.png"
+            :items="trainConsists"
+            label-field="consist_name"
+            :project-id="projectId"
+            route-name="train-consist"
+            value="1"
+            add-tooltip="Create a new train consist"
+            delete-tooltip="Delete this train consist"
+            @add="showAddTrainConsistDialog = true"
+            @delete="deleteTrainConsist"
           />
-          <div class="ml-auto p-0">
-            <Button
-              v-tooltip="'Create a new train station'"
-              icon="pi pi-plus"
-              size="small"
-              rounded
-              raised
-              variant="text"
-              class="m-1 !h-5 !w-5"
-              @click="() => (showAddTrainStationDialog = true)"
-            />
-          </div>
-        </div>
-        <div
-          v-for="(trainStation, trainStationIdx) in trainStations"
-          :key="trainStation.station_name"
-          class="flex w-full items-center gap-2 hover:bg-surface-700"
-        >
-          <div>
-            <Checkbox
-              v-model="selectedTrainStations"
-              :value="trainStationIdx"
-            ></Checkbox>
-          </div>
-          <div>
-            <img
-              src="/data/items/desc-trainstation-c_64.png"
-              style="width: 24px; height: 24px"
-            />
-          </div>
-          <p class="m-0 p-0">
-            <RouterLink
-              :to="{
-                name: 'train-station',
-                params: { projectId, stationIndex: trainStationIdx },
-              }"
-            >
-              {{ trainStation.station_name }}
-            </RouterLink>
-          </p>
-          <div class="ml-auto">
-            <Button
-              v-tooltip="'Delete train station'"
-              icon="pi pi-trash"
-              size="small"
-              variant="text"
-              raised
-              rounded
-              severity="danger"
-              aria-label="Delete train station"
-              class="!h-4 !w-4"
-              @click="($e) => confirmDeleteTrainStation($el, trainStationIdx)"
-            />
-          </div>
-        </div>
-      -->
+        </Accordion>
       </SplitterPanel>
       <SplitterPanel :size="33">
         <router-view />
@@ -209,10 +57,8 @@
       </SplitterPanel>
     </Splitter>
 
-    <AddTrainStationDialog
-      v-model="showAddTrainStationDialog"
-      :project-id="projectId"
-    />
+    <AddTrainStationDialog v-model="showAddTrainStationDialog" :project-id="projectId" />
+    <AddTrainConsistDialog v-model="showAddTrainConsistDialog" :project-id="projectId" />
   </div>
 </template>
 
@@ -221,15 +67,7 @@ import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 
-import {
-  Button,
-  Splitter,
-  SplitterPanel,
-  useConfirm,
-  Checkbox,
-  Accordion,
-  Badge,
-} from "primevue";
+import { Button, Splitter, SplitterPanel, useConfirm, Checkbox, Accordion, Badge } from "primevue";
 
 import { useDeleteProject, useProject } from "@/api/useProjects";
 import NetworkOverviewList from "@/components/NetworkOverviewList.vue";
@@ -237,6 +75,7 @@ import ProjectAutoSave from "@/components/ProjectAutoSave.vue";
 import Spinner from "@/components/Spinner.vue";
 import TrainNetworkOverview from "@/components/TrainNetworkOverview.vue";
 import LeftColumnAccordionPanel from "@/components/projectLayout/LeftColumnAccordionPanel.vue";
+import AddTrainConsistDialog from "@/modals/AddTrainConsistDialog.vue";
 import AddTrainStationDialog from "@/modals/AddTrainStationDialog.vue";
 import { useProjectStore } from "@/stores/useProjectStore";
 const confirm = useConfirm();
@@ -288,6 +127,7 @@ const confirmDeleteProject = (event: MouseEvent) => {
 };
 
 const showAddTrainStationDialog = ref(false);
+const showAddTrainConsistDialog = ref(false);
 
 const trainStations = computed(() => {
   if (project.value) {
@@ -296,16 +136,20 @@ const trainStations = computed(() => {
   return [];
 });
 
+const trainConsists = computed(() => {
+  if (project.value) {
+    return project.value.train_consists || [];
+  }
+  return [];
+});
+
+const deleteTrainConsist = async (consistIdx: number) => {
+  projectStore.removeTrainConsist(consistIdx);
+};
+
 const deleteTrainStation = async (stationIdx: number) => {
   projectStore.removeTrainStation(stationIdx);
 };
-
-/**
- * Adjust the layout if we are directly on a project page
- */
-const isProjectPage = computed(() => {
-  return route.name === "project";
-});
 
 onBeforeRouteLeave(() => {
   if (modified.value === true) {

@@ -19,6 +19,15 @@ export interface TMTrainStation {
   platforms: TMPlatform[];
 }
 
+export interface TMTrainConsist {
+  consist_name: string;
+  railcars: TMRailcar[];
+}
+
+export interface TMRailcar {
+  items: TMPlatformItem[];
+}
+
 export interface TMTruckStation {
   station_name: string;
   direction: TMPlatformMode;
@@ -36,6 +45,7 @@ export interface TMProject {
   owner_id: number;
   project_name: string;
   train_stations: TMTrainStation[];
+  train_consists: TMTrainConsist[];
   truck_stations: TMTruckStation[];
   drone_stations: TMDroneStation[];
 }

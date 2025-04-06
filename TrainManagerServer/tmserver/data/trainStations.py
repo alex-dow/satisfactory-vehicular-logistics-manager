@@ -37,5 +37,16 @@ class TMTrainStation(BaseModel):
     """Deserialized list of platforms"""
 
 
+class TMRailcar(BaseModel):
+    items: List[TMPlatformItem]
+
+class TMTrainConsist(BaseModel):
+    consist_name: str
+    railcars: List[TMRailcar]
+
+
+
+
+
 
  

@@ -5,7 +5,7 @@ from sqlmodel import Field, SQLModel, select
 import json
 
 from tmserver.data.droneStations import TMDroneStation
-from tmserver.data.trainStations import TMTrainStation
+from tmserver.data.trainStations import TMTrainConsist, TMTrainStation
 from tmserver.data.truckStations import TMTruckStation
 from tmserver.data.users import TMUser
 from tmserver.db.conn import engine, Session
@@ -19,6 +19,7 @@ class TMProject(BaseModel):
     train_stations: List[TMTrainStation]
     truck_stations: List[TMTruckStation]
     drone_stations: List[TMDroneStation]
+    train_consists: List[TMTrainConsist]
 
 class ProjectEntry(SQLModel, table=True):
 
@@ -28,11 +29,13 @@ class ProjectEntry(SQLModel, table=True):
     train_stations: str
     truck_stations: str
     drone_stations: str
+    train_consists: str
 
     def toProject(self) -> TMProject:
         train_stations = []
         truck_stations = []
         drone_stations = []
+        train_consists = []
         
         if self.train_stations != None:
             res_train_stations = json.loads(self.train_stations)
@@ -58,7 +61,14 @@ class ProjectEntry(SQLModel, table=True):
             
             drone_stations = [TMDroneStation(**drone_station) for drone_station in res_drone_stations]
 
-        project = TMProject(id=self.id, project_name=self.project_name, drone_stations=drone_stations, truck_stations=truck_stations, train_stations=train_stations, owner_id=self.owner_id)
+        if (self.train_consists != None):
+            res_train_consists = json.loads(self.train_consists)
+            if (type(res_train_consists) is not list):
+                raise RuntimeError("Project #%i has invalid train consists" % id)
+            
+            train_consists = [TMTrainConsist(**train_consist) for train_consist in res_train_consists]
+
+        project = TMProject(id=self.id, project_name=self.project_name, drone_stations=drone_stations, truck_stations=truck_stations, train_stations=train_stations, owner_id=self.owner_id, train_consists=train_consists)
         return project
         
 
@@ -90,6 +100,7 @@ def save_project(project: TMProject) -> TMProject:
         train_station_json = json.dumps(project.train_stations, default=pydantic_encoder)
         truck_station_json = json.dumps(project.truck_stations, default=pydantic_encoder)
         drone_station_json = json.dumps(project.drone_stations, default=pydantic_encoder)
+        train_consist_json = json.dumps(project.train_consists, default=pydantic_encoder)
         
         if project.id:
             entry = session.get(ProjectEntry, project.id)
@@ -98,13 +109,15 @@ def save_project(project: TMProject) -> TMProject:
             entry.train_stations = train_station_json
             entry.truck_stations = truck_station_json
             entry.drone_stations = drone_station_json
+            entry.train_consists = train_consist_json
         else:
             entry = ProjectEntry(
                 owner_id=project.owner_id, # type: ignore
                 project_name=project.project_name,
                 drone_stations=drone_station_json,
                 train_stations=train_station_json,
-                truck_stations=truck_station_json
+                truck_stations=truck_station_json,
+                train_consists=train_consist_json
             )
 
         session.add(entry)
@@ -123,7 +136,8 @@ def create_project(project: TMProject, owner_id: int) -> TMProject:
         project_name=project.project_name,
         drone_stations=project.drone_stations,
         truck_stations=project.truck_stations,
-        train_stations=project.train_stations
+        train_stations=project.train_stations,
+        train_consists=project.train_consists
     )
 
     return save_project(newProject)
