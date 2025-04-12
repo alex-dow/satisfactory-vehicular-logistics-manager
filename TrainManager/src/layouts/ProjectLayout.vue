@@ -130,8 +130,10 @@ const showAddTrainStationDialog = ref(false);
 const showAddTrainConsistDialog = ref(false);
 
 const trainStations = computed(() => {
-  if (project.value) {
-    return project.value.train_stations || [];
+  if (project.value && project.value.train_stations) {
+    return project.value.train_stations.sort((a,b) => {
+      return a.station_name.localeCompare(b.station_name);
+    });
   }
   return [];
 });
