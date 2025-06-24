@@ -1,2 +1,1 @@
-# satisfactory-train-manager
-A webapp to manage train stations in Satisfactory
+started over at https://github.com/alex-dow/svm
